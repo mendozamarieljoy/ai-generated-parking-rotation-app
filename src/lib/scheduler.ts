@@ -14,6 +14,10 @@ import {
   isHoliday,
 } from "./utils";
 
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
 const slots: Slot[] = ["332", "27", "28"];
 
 function getCombinations<T>(arr: T[], k: number): T[][] {
@@ -216,17 +220,23 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
     Object.entries(bestAssignment.slots).forEach(([slotKey, slotValue]) => {
       const slot = slotKey as Slot;
       assignments[slot] = slotValue;
-      userStats[slotValue.primary].primary += 1;
-      userStats[slotValue.backup].backup += 1;
+      userStats[slotValue.primary!].primary += 1;
+      userStats[slotValue.backup!].backup += 1;
       if (slot === "332") {
-        userStats[slotValue.primary].slot332 += 1;
+        userStats[slotValue.primary!].slot332 += 1;
       }
     });
 
+    dayjs.extend(utc);
+    dayjs.extend(timezone);
+
+    const phtDate = dayjs(date).tz("Asia/Manila").format("YYYY-MM-DD");
+
     schedule.push({
-      date: date.toISOString().split("T")[0],
+      date: phtDate,
       day: getDayName(date),
       slots: assignments,
+      unavailableSlots: [],
     });
   }
 

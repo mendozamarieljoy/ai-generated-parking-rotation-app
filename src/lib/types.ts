@@ -5,22 +5,23 @@ export const users = [
   "Raph",
   "Lady",
   "Marvs",
-  "Erwin"
+  "Erwin",
 ] as const;
 
-export type User = typeof users[number];
+export type User = (typeof users)[number];
 
 export type Slot = "332" | "27" | "28";
 
 export type SlotAssignment = {
-  primary: User;
-  backup: User;
+  primary: User | null;
+  backup: User | null;
 };
 
 export type DaySchedule = {
   date: string; // YYYY-MM-DD
   day: string; // e.g., "Monday"
   slots: Record<Slot, SlotAssignment>;
+  unavailableSlots: Slot[];
 };
 
 export type UserStats = {

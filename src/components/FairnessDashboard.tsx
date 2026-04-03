@@ -13,9 +13,9 @@ export default function FairnessDashboard() {
   const mostUnderused = sortedUsers[sortedUsers.length - 1];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="w-full bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">Fairness Dashboard</h2>
-      <div className="space-y-4">
+      <div className="grid lg:grid-cols-3 gap-4">
         {users.map((user) => {
           const stats = userStats[user];
           return (
