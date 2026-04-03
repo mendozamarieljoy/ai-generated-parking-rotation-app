@@ -8,7 +8,7 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { useState } from "react";
 import Modal from "./Modal";
-
+import { domToPng } from "modern-screenshot";
 export default function Calendar() {
   const { schedule, skipPrimary } = useParkingStore();
 
@@ -56,54 +56,32 @@ export default function Calendar() {
     return schedule.find((s) => s.date === dateStr);
   };
 
-  const getSlotColor = (slot: Slot, isUnavailable: boolean) => {
-    if (isUnavailable) return "bg-gray-300 border-gray-400";
-    switch (slot) {
-      case "27":
-        return "bg-blue-100 border-blue-300";
-      case "28":
-        return "bg-blue-200 border-blue-400";
-      case "332":
-        return "bg-blue-300 border-blue-500";
-    }
-  };
-
   const renderSlot = (
     slot: Slot,
     assignment: { primary: string | null; backup: string | null },
     date: string,
-    unavailableSlots: Slot[],
   ) => {
-    const isUnavailable = unavailableSlots.includes(slot);
     return (
       <div
         key={slot}
-        className="flex flex-col shadow-md rounded-md p-4 border border-gray-200"
+        className="flex flex-col shadow-md rounded-md p-4 bg-white text-black border border-gray-200"
       >
         <div className="flex justify-between items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`${getSlotColor(slot, isUnavailable)} p-2 text-xs rounded-lg max-w-12 text-center font-bold`}
-              >
-                #{slot}
-              </span>
-              <div>
-                <div>
-                  <p className="text-xs">Primary user</p>
-                  <p className="font-bold">{assignment.primary}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">
-                    Backup user: {assignment.backup}
-                  </p>
-                </div>
-              </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xl text-center font-bold w-12 h-12 border rounded-lg flex items-center justify-center">
+              {slot}
+            </span>
+            <div>
+              <p className="font-bold">{assignment.primary}</p>
+              <p className="text-xs text-gray-500">
+                Backup user: {assignment.backup}
+              </p>
             </div>
           </div>
           <button
+            data-hide-export
             onClick={() => setToSkipSlot({ date, slot })}
-            className="text-xs bg-red-500 text-white font-bold uppercase px-4 py-2 rounded hover:bg-red-600"
+            className="text-xs bg-slate-500 hover:bg-slate-600 text-white font-bold uppercase px-4 py-2 rounded"
           >
             Skip
           </button>
@@ -113,12 +91,60 @@ export default function Calendar() {
     );
   };
 
+  const exportCalendar = async () => {
+    const el = document.getElementById("parking-schedule-calendar");
+
+    // TypeScript now knows 'el' is either HTMLElement or null
+    if (el) {
+      const width = el.scrollWidth;
+      const height = el.scrollHeight;
+
+      const dataUrl = await domToPng(el, {
+        width: width, // Forces the output to the full content width
+        height: height, // Forces the output to the full content height
+        style: {
+          overflow: "visible", // Ensures the CSS doesn't try to clip it
+        },
+        filter: (node) => {
+          const exclusionAttribute = "data-hide-export";
+          if (
+            node instanceof HTMLElement &&
+            node.hasAttribute(exclusionAttribute)
+          ) {
+            return false;
+          }
+          return true;
+        },
+      });
+      // Inside this block, 'el' is guaranteed to be a Node/HTMLElement
+      // const dataUrl = await domToPng(el);
+
+      const link = document.createElement("a");
+      link.download = "calendar.png";
+      link.href = dataUrl;
+      link.click();
+    } else {
+      console.error(
+        "Target element 'parking-schedule-calendar' not found in the DOM.",
+      );
+    }
+  };
+
   return (
-    <div>
-      <h2 className="text-lg lg:text-2xl font-bold mb-4">
-        April 2026 Parking Schedule
-      </h2>
-      <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+    <>
+      <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
+        <h2 className="text-lg lg:text-2xl font-bold">April 2026</h2>
+        <button
+          onClick={exportCalendar}
+          className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-600 text-xs"
+        >
+          Save as image
+        </button>
+      </div>
+      <div
+        id="parking-schedule-calendar"
+        className="bg-white p-6 rounded-lg shadow-md overflow-x-auto"
+      >
         <div className="grid grid-cols-5 gap-4 min-w-400 max-w-full">
           {daysInWeek.map((day) => (
             <div key={day} className="text-center font-semibold p-2">
@@ -128,7 +154,7 @@ export default function Calendar() {
           {weekdayCalendarDays.map((date, index) => (
             <div
               key={index}
-              className={`min-h-32 p-2 ${date && "border border-gray-200 rounded-md"}`}
+              className={`min-h-32 p-2 ${date && "bg-gray-100 rounded-lg"}`}
             >
               {date && (
                 <>
@@ -145,7 +171,6 @@ export default function Calendar() {
                               slot as Slot,
                               assignment,
                               daySchedule.date,
-                              daySchedule.unavailableSlots,
                             ),
                         )}
                       </div>
@@ -175,6 +200,6 @@ export default function Calendar() {
         }}
         onCancel={() => setToSkipSlot(null)}
       />
-    </div>
+    </>
   );
 }
