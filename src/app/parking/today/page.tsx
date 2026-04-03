@@ -69,10 +69,16 @@ function formatSlot(
 export default function TodaySchedulePage() {
   const { schedule, skipPrimary } = useParkingStore();
   const [selectedDate, setSelectedDate] = useState(() => {
+    const currentDate = dayjs().format("YYYY-MM-DD");
     if (schedule.length > 0) {
-      return schedule[0].date;
+      if (schedule[0].date === currentDate) {
+        return schedule[0].date;
+      } else {
+        const found = schedule.find((s) => s.date === currentDate);
+        return found ? found.date : schedule[0].date;
+      }
     }
-    return new Date().toISOString().split("T")[0];
+    return currentDate;
   });
 
   const [toSkipSlot, setToSkipSlot] = useState<{
