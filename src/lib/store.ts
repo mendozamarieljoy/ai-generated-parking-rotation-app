@@ -1,16 +1,30 @@
 import { create } from "zustand";
-import { DaySchedule, UserStats, CostStats, Slot, User } from "./types";
+import {
+  DaySchedule,
+  UserStats,
+  CostStats,
+  Slot,
+  User,
+  DaySlots,
+} from "./types";
 import { generateSchedule } from "./scheduler";
 import { calculateFairnessScore, calculateBenefitScore } from "./utils";
 import { users } from "./types";
+import { usersList } from "./constants";
 
 interface ParkingState {
   schedule: DaySchedule[];
+  filteredSchedule: DaySchedule[];
   userStats: Record<string, UserStats>;
   costStats: Record<string, CostStats>;
+  selectedYear: number;
+  selectedMonth: number;
+  filteredUsers: Array<string>;
+  setDate: (year: number, month: number) => void;
   regenerateSchedule: () => void;
   toggleUnavailableSlot: (date: string, slot: Slot) => void;
   skipPrimary: (date: string, slot: Slot) => void;
+  filterByUsers: (users: string[]) => void;
 }
 
 const COST_PER_SLOT = 50;
@@ -87,19 +101,43 @@ function calculateCostStats(
   return costStats;
 }
 
+const DEFAULT_YEAR = 2026;
+const DEFAULT_MONTH = 3;
+
 // Initialize stats
-const initialSchedule = generateSchedule(2026, 3);
+const initialSchedule = generateSchedule(DEFAULT_YEAR, DEFAULT_MONTH);
 const initialUserStats = calculateUserStats(initialSchedule);
 const initialCostStats = calculateCostStats(initialSchedule, initialUserStats);
+const initialUsers: string[] = [];
 
 export const useParkingStore = create<ParkingState>((set, get) => ({
+  selectedYear: DEFAULT_YEAR,
+  selectedMonth: DEFAULT_MONTH,
   schedule: initialSchedule,
+  filteredSchedule: initialSchedule,
   userStats: initialUserStats,
   costStats: initialCostStats,
-  regenerateSchedule: () => {
-    const newSchedule = generateSchedule(2026, 3);
+  filteredUsers: initialUsers,
+  setDate: (year, month) => {
+    const newSchedule = generateSchedule(year, month);
     const newUserStats = calculateUserStats(newSchedule);
     const newCostStats = calculateCostStats(newSchedule, newUserStats);
+
+    set({
+      selectedYear: year,
+      selectedMonth: month,
+      schedule: newSchedule,
+      userStats: newUserStats,
+      costStats: newCostStats,
+    });
+  },
+  regenerateSchedule: () => {
+    const { selectedYear, selectedMonth } = get();
+
+    const newSchedule = generateSchedule(selectedYear, selectedMonth);
+    const newUserStats = calculateUserStats(newSchedule);
+    const newCostStats = calculateCostStats(newSchedule, newUserStats);
+
     set({
       schedule: newSchedule,
       userStats: newUserStats,
@@ -255,6 +293,46 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
       schedule: newSchedule,
       userStats: newUserStats,
       costStats: newCostStats,
+    });
+  },
+  filterByUsers: (users: Array<string>) => {
+    const { schedule } = get();
+    const filteredSchedule = [...schedule].map((daySchedule) => {
+      const updatedSlots: DaySlots = {
+        332: null,
+        27: null,
+        28: null,
+      };
+      const userInRotation = Object.entries(daySchedule.slots).find(
+        ([slot, assignment]) => {
+          if (
+            assignment &&
+            users.some(
+              (u) => u === assignment.primary || u === assignment.backup,
+            )
+          ) {
+            return {
+              [slot]: assignment,
+            };
+          }
+        },
+      );
+
+      if (userInRotation) {
+        const [slotKey, assignment] = userInRotation;
+        updatedSlots[slotKey as keyof DaySlots] = assignment;
+      }
+
+      return {
+        ...daySchedule,
+        slots: updatedSlots,
+      };
+    });
+
+    set({
+      schedule,
+      filteredSchedule,
+      filteredUsers: users,
     });
   },
 }));

@@ -60,3 +60,36 @@ export function isWeekend(date: Date): boolean {
 export function getDayName(date: Date): string {
   return date.toLocaleDateString("en-US", { weekday: "long" });
 }
+
+export type MonthOption = {
+  year: number;
+  month: number; // 1-12
+  label: string;
+  value: string; // "2026-4"
+};
+
+export function getNext12Months(fromDate = new Date()): MonthOption[] {
+  const result: MonthOption[] = [];
+
+  const year = fromDate.getFullYear();
+  const month = fromDate.getMonth(); // 0-based
+
+  for (let i = 0; i < 12; i++) {
+    const date = new Date(year, month + i, 1);
+
+    const y = date.getFullYear();
+    const m = date.getMonth();
+
+    result.push({
+      year: y,
+      month: m,
+      label: date.toLocaleString("en-US", {
+        month: "long",
+        year: "numeric",
+      }),
+      value: `${y}-${m}`,
+    });
+  }
+
+  return result;
+}

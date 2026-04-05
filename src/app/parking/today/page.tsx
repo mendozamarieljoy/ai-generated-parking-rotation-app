@@ -1,55 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useParkingStore } from "@/lib/store";
 import { Slot } from "@/lib/types";
 import dayjs from "dayjs";
 import Modal from "@/components/Modal";
-
-function formatSlot(
-  slot: Slot,
-  assignment: { primary: string | null; backup: string | null } | null,
-  date: string,
-  setToSkipSlot: (value: { date: string; slot: Slot } | null) => void,
-) {
-  return (
-    <div
-      key={slot}
-      className={`flex flex-col rounded-md p-4 border border-gray-200 ${!assignment ? "opacity-50" : "shadow-md "}`}
-    >
-      <div className="flex justify-between items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span
-              className={`p-2 text-xs rounded-lg max-w-12 text-center font-bold`}
-            >
-              #{slot}
-            </span>
-            <div>
-              {assignment ? (
-                <>
-                  <p className="font-bold">{assignment.primary}</p>
-                  <p className="text-xs text-gray-500">
-                    Backup user: {assignment.backup}
-                  </p>
-                </>
-              ) : (
-                <p className="text-xs text-red-500 italic">Unavailable</p>
-              )}
-            </div>
-          </div>
-        </div>
-        {/* <button
-          onClick={() => setToSkipSlot({ date, slot })}
-          className="text-xs bg-red-500 text-white font-bold uppercase px-4 py-2 rounded hover:bg-red-600"
-        >
-          Skip
-        </button> */}
-      </div>
-      <div className="flex justify-between items-center gap-4 text-sm w-full"></div>
-    </div>
-  );
-}
+import ParkingSlot from "@/components/ParkingSlot";
+import Header from "@/components/Header";
 
 export default function TodaySchedulePage() {
   const { schedule, skipPrimary } = useParkingStore();
@@ -82,33 +39,28 @@ export default function TodaySchedulePage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="p-4 flex justify-between items-center gap-x-4 bg-slate-800 text-white">
-        <h1 className="uppercase text-white font-bold font-mono">
-          Parking Rotation System
-        </h1>
-        <a
-          href="/parking"
-          className="px-4 py-2 text-xs uppercase font-bold bg-white text-slate-950 rounded hover:bg-gray-200"
-        >
-          View calendar
-        </a>
-      </div>
-      <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-2xl font-bold uppercase mb-4">
-          Daily Parking Schedule
-        </h1>
+    <>
+      <Header
+        title="Parking Rotation System"
+        actionMenu={{
+          label: "View calendar",
+          href: "/parking",
+        }}
+      />
+      <div className="flex flex-col max-w-2xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-4">Schedule Today</h1>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <label
-            className="block font-medium text-gray-700 mb-2"
+            className="block font-mono font-medium text-gray-700 uppercase text-xs"
             htmlFor="date"
           >
             Select a day
           </label>
           <select
             id="date"
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            // className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full outline-none py-2 border-b bg-transparent cursor-pointer"
             value={selectedDate}
             onChange={(event) => setSelectedDate(event.target.value)}
           >
@@ -121,17 +73,16 @@ export default function TodaySchedulePage() {
         </div>
 
         {scheduleForDate ? (
-          <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
+          <div className="bg-white p-6 rounded-lg shadow-md space-y-4 h-full">
             <h2 className="text-2xl font-semibold">
               Schedule for {dayjs(selectedDate).format("MMMM D, YYYY (dddd)")}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {Object.entries(scheduleForDate.slots).map(([slot, assignment]) =>
-                formatSlot(
-                  slot as Slot,
-                  assignment,
-                  scheduleForDate.date,
-                  setToSkipSlot,
+            <div className="flex gap-4 h-32 md:h-42">
+              {Object.entries(scheduleForDate.slots).map(
+                ([slot, assignment]) => (
+                  <Fragment key={slot}>
+                    <ParkingSlot slot={slot as Slot} assignment={assignment} />
+                  </Fragment>
                 ),
               )}
             </div>
@@ -158,6 +109,6 @@ export default function TodaySchedulePage() {
         }}
         onCancel={() => setToSkipSlot(null)}
       />
-    </div>
+    </>
   );
 }

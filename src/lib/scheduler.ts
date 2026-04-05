@@ -124,14 +124,14 @@ function evaluateFairnessScore(
   );
 }
 
-console.log({ unavailableSlotsByDate });
-
 export function generateSchedule(year: number, month: number): DaySchedule[] {
   const days = getDaysInMonth(year, month)
     .filter((date) => !isWeekend(date) && !isHoliday(date))
     .filter((date) => {
-      const day = date.getDate();
-      return day > 5; // exclude April 1-5
+      if (month === 3) {
+        const day = date.getDate();
+        return day > 5; // exclude April 1-5
+      } else return true;
     });
   const schedule: DaySchedule[] = [];
 
@@ -155,8 +155,6 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
     const phtDate = dayjs(date).tz("Asia/Manila").format("YYYY-MM-DD");
 
     const unavailableSlots = unavailableSlotsByDate[phtDate] ?? [];
-
-    console.log({ phtDate, unavailableSlots });
 
     const assignments: Record<Slot, SlotAssignment> = {} as Record<
       Slot,

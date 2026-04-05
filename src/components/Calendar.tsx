@@ -6,11 +6,26 @@ import { DaySchedule, Slot } from "@/lib/types";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Modal from "./Modal";
-import { domToPng } from "modern-screenshot";
+import { getNext12Months } from "@/lib/utils";
+import ParkingSlot from "./ParkingSlot";
+import ParkingSlotWrapper from "./ParkingSlotWrapper";
+import SchedulerControls from "./SchedulerControls";
+import FilterByUser from "./FilterByUser";
+import CompactMode from "./CompactMode";
+
 export default function Calendar() {
-  const { schedule, skipPrimary } = useParkingStore();
+  const availableMonths = getNext12Months();
+
+  const {
+    schedule,
+    skipPrimary,
+    setDate,
+    selectedMonth,
+    selectedYear,
+    regenerateSchedule,
+  } = useParkingStore();
 
   const [toSkipSlot, setToSkipSlot] = useState<{
     date: string;
@@ -20,8 +35,8 @@ export default function Calendar() {
   const daysInWeek = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
   // Get April 2026 calendar
-  const year = 2026;
-  const month = 3; // April
+  const year = selectedYear;
+  const month = selectedMonth; // Month is 0-indexed
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const startDate = new Date(firstDay);
@@ -49,145 +64,72 @@ export default function Calendar() {
     });
   }
 
-  const getScheduleForDate = (date: Date): DaySchedule | undefined => {
-    dayjs.extend(utc);
-    dayjs.extend(timezone);
-    const dateStr = dayjs(date).tz("Asia/Manila").format("YYYY-MM-DD");
-    return schedule.find((s) => s.date === dateStr);
-  };
-
-  const renderSlot = (
-    slot: Slot,
-    assignment: { primary: string | null; backup: string | null } | null,
-    date: string,
-  ) => {
-    return (
-      <div
-        key={slot}
-        className={`flex flex-col rounded-md p-4 bg-white text-black border border-gray-200 ${!assignment ? "opacity-50" : "shadow-md "}`}
-      >
-        <div className="flex items-center gap-4">
-          <span className="text-xl text-center font-bold w-12 h-12 border rounded-lg flex items-center justify-center">
-            {slot}
-          </span>
-          <div>
-            {assignment ? (
-              <>
-                <p className="font-bold">{assignment.primary}</p>
-                <p className="text-xs text-gray-500">
-                  Backup user: {assignment.backup}
-                </p>
-              </>
-            ) : (
-              <p className="text-xs text-red-500 italic">Unavailable</p>
-            )}
-          </div>
-        </div>
-        {/* <button
-            data-hide-export
-            onClick={() => setToSkipSlot({ date, slot })}
-            className="text-xs bg-slate-500 hover:bg-slate-600 text-white font-bold uppercase px-4 py-2 rounded"
-          >
-            Skip
-          </button> */}
-      </div>
-    );
-  };
-
-  const exportCalendar = async () => {
-    const el = document.getElementById("parking-schedule-calendar");
-
-    // TypeScript now knows 'el' is either HTMLElement or null
-    if (el) {
-      const width = el.scrollWidth;
-      const height = el.scrollHeight;
-
-      const dataUrl = await domToPng(el, {
-        width: width, // Forces the output to the full content width
-        height: height, // Forces the output to the full content height
-        style: {
-          overflow: "visible", // Ensures the CSS doesn't try to clip it
-        },
-        filter: (node) => {
-          const exclusionAttribute = "data-hide-export";
-          if (
-            node instanceof HTMLElement &&
-            node.hasAttribute(exclusionAttribute)
-          ) {
-            return false;
-          }
-          return true;
-        },
-      });
-      // Inside this block, 'el' is guaranteed to be a Node/HTMLElement
-      // const dataUrl = await domToPng(el);
-
-      const link = document.createElement("a");
-      link.download = `export-parking-rotation-${dayjs().format("YYYYMMDDhhmmss")}.png`;
-      link.href = dataUrl;
-      link.click();
-    } else {
-      console.error(
-        "Target element 'parking-schedule-calendar' not found in the DOM.",
-      );
-    }
-  };
-
   return (
     <>
-      <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
-        <h2 className="text-lg lg:text-2xl font-bold">April 2026</h2>
-        <button
-          onClick={exportCalendar}
-          className="bg-slate-500 text-white px-4 py-2 rounded hover:bg-slate-600 text-xs"
-        >
-          Save as image
-        </button>
+      <div className="flex items-center justify-between gap-2 bg-white px-6 py-4 rounded-lg shadow-md mb-4">
+        <div className="">
+          <label
+            htmlFor="month-select"
+            className="font-mono font-medium text-gray-700 uppercase text-xs"
+          >
+            Select a month
+          </label>
+          <select
+            id="month-select"
+            className="w-full outline-none py-2 border-b bg-transparent cursor-pointer"
+            value={`${selectedYear}-${selectedMonth}`}
+            onChange={(e) => {
+              const [year, month] = e.target.value.split("-").map(Number);
+              setDate(year, month);
+            }}
+          >
+            {availableMonths.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <SchedulerControls />
       </div>
       <div
         id="parking-schedule-calendar"
-        className="bg-white p-6 rounded-lg shadow-md overflow-x-auto"
+        className="bg-white p-6 rounded-lg shadow-md overflow-x-auto hidden md:block"
       >
+        <div className="flex justify-between text-2xl font-sans border-b border-gray-100 text-slate-800 font-bold text-center uppercase pb-4 mb-4">
+          <h2>
+            {dayjs(`${selectedYear}-${selectedMonth + 1}-01`).format("MMMM")}
+          </h2>
+          <FilterByUser />
+          <h2>{selectedYear}</h2>
+        </div>
         <div className="grid grid-cols-5 gap-4 min-w-400 max-w-full">
           {daysInWeek.map((day) => (
-            <div key={day} className="text-center font-semibold p-2">
+            <div
+              key={day}
+              className="text-center font-semibold p-2 border-b border-slate-300"
+            >
               {day}
             </div>
           ))}
           {weekdayCalendarDays.map((date, index) => (
             <div
               key={index}
-              className={`min-h-32 p-2 ${date && "bg-gray-100 rounded-lg"}`}
+              className={`min-h-32 ${date && "bg-white-100 p-4 border border-slate-200 shadow rounded-lg"}`}
             >
               {date && (
                 <>
-                  <div className="text-sm font-semibold mb-1">
+                  <div className="text-sm font-sans font-semibold mb-1">
                     {date.getDate()}
                   </div>
-                  {(() => {
-                    const daySchedule = getScheduleForDate(date);
-                    return daySchedule && daySchedule?.date ? (
-                      <div className="space-y-4">
-                        {Object.entries(daySchedule.slots).map(
-                          ([slot, assignment]) =>
-                            renderSlot(
-                              slot as Slot,
-                              assignment,
-                              daySchedule?.date,
-                            ),
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-500">No schedule</div>
-                    );
-                  })()}
+                  <ParkingSlotWrapper date={date} innerClassName="max-w-1/3" />
                 </>
               )}
             </div>
           ))}
         </div>
       </div>
-
+      <CompactMode />
       <Modal
         isOpen={!!toSkipSlot}
         title={`Skip parking for ${dayjs(toSkipSlot?.date).format("MMMM D, YYYY")}

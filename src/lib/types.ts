@@ -19,7 +19,7 @@ export type SlotAssignment = {
 
 type SlotState = SlotAssignment | null;
 
-type DaySlots = Record<Slot, SlotState>;
+export type DaySlots = Record<Slot, SlotState>;
 
 export type DaySchedule = {
   date: string; // YYYY-MM-DD
