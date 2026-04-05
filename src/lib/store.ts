@@ -32,13 +32,13 @@ function calculateUserStats(
       if (day.unavailableSlots.includes(slotKey as Slot)) {
         return;
       }
-      if (slot.primary) {
+      if (slot?.primary) {
         stats[slot.primary].primary++;
         if (slotKey === "332") {
           stats[slot.primary].slot332++;
         }
       }
-      if (slot.backup) {
+      if (slot?.backup) {
         stats[slot.backup].backup++;
       }
     });
@@ -159,7 +159,10 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
         }
         if (!assignedBackup && nextAssignment.backup && assignedPrimary) {
           // If we still need to assign backup, try to swap with another backup slot
-          if (nextAssignment.backup !== displacedPrimary) {
+          if (
+            nextAssignment.backup !== displacedPrimary &&
+            modifiedSchedule[nextDayIndex].slots[nextSlot]
+          ) {
             modifiedSchedule[nextDayIndex].slots[nextSlot] = {
               ...modifiedSchedule[nextDayIndex].slots[nextSlot],
               backup: displacedBackup,
@@ -208,8 +211,10 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
     const dayIndex = schedule.findIndex((d) => d.date === date);
     if (dayIndex === -1) return;
 
-    const primaryUser = schedule[dayIndex].slots[slot].primary;
-    const backupUser = schedule[dayIndex].slots[slot].backup;
+    const primaryUser =
+      dayIndex >= 0 ? schedule[dayIndex].slots[slot]?.primary : null;
+    const backupUser =
+      dayIndex >= 0 ? schedule[dayIndex].slots[slot]?.backup : null;
 
     const newSchedule = JSON.parse(JSON.stringify(schedule));
 

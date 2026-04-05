@@ -58,7 +58,7 @@ export default function Calendar() {
 
   const renderSlot = (
     slot: Slot,
-    assignment: { primary: string | null; backup: string | null },
+    assignment: { primary: string | null; backup: string | null } | null,
     date: string,
   ) => {
     return (
@@ -166,14 +166,14 @@ export default function Calendar() {
                   </div>
                   {(() => {
                     const daySchedule = getScheduleForDate(date);
-                    return daySchedule ? (
+                    return daySchedule && daySchedule?.date ? (
                       <div className="space-y-4">
                         {Object.entries(daySchedule.slots).map(
                           ([slot, assignment]) =>
                             renderSlot(
                               slot as Slot,
                               assignment,
-                              daySchedule.date,
+                              daySchedule?.date,
                             ),
                         )}
                       </div>

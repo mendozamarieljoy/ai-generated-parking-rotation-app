@@ -139,7 +139,10 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
     { primary: number; backup: number; slot332: number }
   > = Object.fromEntries(
     users.map((u) => [u, { primary: 0, backup: 0, slot332: 0 }]),
-  ) as any;
+  ) as unknown as Record<
+    User,
+    { primary: number; backup: number; slot332: number }
+  >;
 
   for (const date of days) {
     const mmdd = dayjs(date).format("MM-DD-YYYY");
@@ -204,7 +207,8 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
             if (unavailableSlots.includes(slot)) return;
 
             const assignment = daySlots[slot];
-            if (!assignment) return;
+            if (!assignment || !assignment.primary || !assignment.backup)
+              return;
 
             projected[assignment.primary].primary += 1;
             projected[assignment.backup].backup += 1;
@@ -235,7 +239,7 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
       const value = best.slots[slot];
       assignments[slot] = value ?? null;
 
-      if (!value) continue;
+      if (!value || !value.primary || !value.backup) continue;
 
       userStats[value.primary].primary += 1;
       userStats[value.backup].backup += 1;

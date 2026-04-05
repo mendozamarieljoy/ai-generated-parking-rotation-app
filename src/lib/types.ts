@@ -17,10 +17,14 @@ export type SlotAssignment = {
   backup: User | null;
 };
 
+type SlotState = SlotAssignment | null;
+
+type DaySlots = Record<Slot, SlotState>;
+
 export type DaySchedule = {
   date: string; // YYYY-MM-DD
   day: string; // e.g., "Monday"
-  slots: Record<Slot, SlotAssignment>;
+  slots: DaySlots;
   unavailableSlots: Slot[];
 };
 
