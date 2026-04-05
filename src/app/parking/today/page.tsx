@@ -8,7 +8,7 @@ import Modal from "@/components/Modal";
 
 function formatSlot(
   slot: Slot,
-  assignment: { primary: string | null; backup: string | null },
+  assignment: { primary: string | null; backup: string | null } | null,
   date: string,
   setToSkipSlot: (value: { date: string; slot: Slot } | null) => void,
 ) {
@@ -26,15 +26,16 @@ function formatSlot(
               #{slot}
             </span>
             <div>
-              <div>
-                <p className="text-xs">Primary user</p>
-                <p className="font-bold">{assignment.primary}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">
-                  Backup user: {assignment.backup}
-                </p>
-              </div>
+              {assignment ? (
+                <>
+                  <p className="font-bold">{assignment.primary}</p>
+                  <p className="text-xs text-gray-500">
+                    Backup user: {assignment.backup}
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-500">Unavailable</p>
+              )}
             </div>
           </div>
         </div>
@@ -46,22 +47,6 @@ function formatSlot(
         </button>
       </div>
       <div className="flex justify-between items-center gap-4 text-sm w-full"></div>
-    </div>
-  );
-
-  return (
-    <div key={slot} className="p-3 rounded-lg border bg-white shadow-sm">
-      <div className="flex justify-between items-center mb-1">
-        <span className="font-semibold">#{slot}</span>
-      </div>
-      <div className="text-sm">
-        <p>
-          Primary: <strong>{assignment.primary}</strong>
-        </p>
-        <p>
-          Backup: <strong>{assignment.backup}</strong>
-        </p>
-      </div>
     </div>
   );
 }
