@@ -15,7 +15,7 @@ function formatSlot(
   return (
     <div
       key={slot}
-      className="flex flex-col shadow-md rounded-md p-4 border border-gray-200"
+      className={`flex flex-col rounded-md p-4 border border-gray-200 ${!assignment ? "opacity-50" : "shadow-md "}`}
     >
       <div className="flex justify-between items-center gap-4">
         <div>
@@ -34,7 +34,7 @@ function formatSlot(
                   </p>
                 </>
               ) : (
-                <p className="text-gray-500">Unavailable</p>
+                <p className="text-xs text-red-500 italic">Unavailable</p>
               )}
             </div>
           </div>

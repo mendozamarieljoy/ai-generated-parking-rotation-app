@@ -64,7 +64,7 @@ export default function Calendar() {
     return (
       <div
         key={slot}
-        className="flex flex-col shadow-md rounded-md p-4 bg-white text-black border border-gray-200"
+        className={`flex flex-col rounded-md p-4 bg-white text-black border border-gray-200 ${!assignment ? "opacity-50" : "shadow-md "}`}
       >
         <div className="flex items-center gap-4">
           <span className="text-xl text-center font-bold w-12 h-12 border rounded-lg flex items-center justify-center">
@@ -79,7 +79,7 @@ export default function Calendar() {
                 </p>
               </>
             ) : (
-              <p className="text-gray-500">Unavailable</p>
+              <p className="text-xs text-red-500 italic">Unavailable</p>
             )}
           </div>
         </div>
