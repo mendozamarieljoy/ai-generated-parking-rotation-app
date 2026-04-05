@@ -123,7 +123,7 @@ export default function Calendar() {
       // const dataUrl = await domToPng(el);
 
       const link = document.createElement("a");
-      link.download = "calendar.png";
+      link.download = `export-parking-rotation-${dayjs().format("YYYYMMDDhhmmss")}.png`;
       link.href = dataUrl;
       link.click();
     } else {
