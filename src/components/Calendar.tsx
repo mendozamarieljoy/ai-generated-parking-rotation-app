@@ -66,33 +66,30 @@ export default function Calendar() {
         key={slot}
         className="flex flex-col shadow-md rounded-md p-4 bg-white text-black border border-gray-200"
       >
-        <div className="flex justify-between items-center gap-4">
-          <div className="flex items-center gap-4">
-            <span className="text-xl text-center font-bold w-12 h-12 border rounded-lg flex items-center justify-center">
-              {slot}
-            </span>
-            <div>
-              {assignment ? (
-                <>
-                  <p className="font-bold">{assignment.primary}</p>
-                  <p className="text-xs text-gray-500">
-                    Backup user: {assignment.backup}
-                  </p>
-                </>
-              ) : (
-                <p className="text-gray-500">Unavailable</p>
-              )}
-            </div>
+        <div className="flex items-center gap-4">
+          <span className="text-xl text-center font-bold w-12 h-12 border rounded-lg flex items-center justify-center">
+            {slot}
+          </span>
+          <div>
+            {assignment ? (
+              <>
+                <p className="font-bold">{assignment.primary}</p>
+                <p className="text-xs text-gray-500">
+                  Backup user: {assignment.backup}
+                </p>
+              </>
+            ) : (
+              <p className="text-gray-500">Unavailable</p>
+            )}
           </div>
-          <button
+        </div>
+        {/* <button
             data-hide-export
             onClick={() => setToSkipSlot({ date, slot })}
             className="text-xs bg-slate-500 hover:bg-slate-600 text-white font-bold uppercase px-4 py-2 rounded"
           >
             Skip
-          </button>
-        </div>
-        <div className="flex justify-between items-center gap-4 text-sm w-full"></div>
+          </button> */}
       </div>
     );
   };
