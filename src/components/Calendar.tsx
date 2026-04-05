@@ -72,10 +72,16 @@ export default function Calendar() {
               {slot}
             </span>
             <div>
-              <p className="font-bold">{assignment.primary}</p>
-              <p className="text-xs text-gray-500">
-                Backup user: {assignment.backup}
-              </p>
+              {assignment ? (
+                <>
+                  <p className="font-bold">{assignment.primary}</p>
+                  <p className="text-xs text-gray-500">
+                    Backup user: {assignment.backup}
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-500">Unavailable</p>
+              )}
             </div>
           </div>
           <button
