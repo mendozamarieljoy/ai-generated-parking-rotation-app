@@ -39,12 +39,12 @@ function formatSlot(
             </div>
           </div>
         </div>
-        <button
+        {/* <button
           onClick={() => setToSkipSlot({ date, slot })}
           className="text-xs bg-red-500 text-white font-bold uppercase px-4 py-2 rounded hover:bg-red-600"
         >
           Skip
-        </button>
+        </button> */}
       </div>
       <div className="flex justify-between items-center gap-4 text-sm w-full"></div>
     </div>
@@ -83,15 +83,15 @@ export default function TodaySchedulePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="p-4 flex justify-between align-middle gap-x-4 bg-slate-800 text-white">
+      <div className="p-4 flex justify-between items-center gap-x-4 bg-slate-800 text-white">
         <h1 className="uppercase text-white font-bold font-mono">
           Parking Rotation System
         </h1>
         <a
           href="/parking"
-          className="mt-4 lg:mt-0 px-4 py-2 text-xs uppercase font-bold bg-white text-slate-950 rounded hover:bg-gray-200"
+          className="px-4 py-2 text-xs uppercase font-bold bg-white text-slate-950 rounded hover:bg-gray-200"
         >
-          View dashboard
+          View calendar
         </a>
       </div>
       <div className="max-w-4xl mx-auto p-6">

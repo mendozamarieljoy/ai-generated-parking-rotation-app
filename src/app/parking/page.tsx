@@ -8,15 +8,15 @@ import SchedulerControls from "@/components/SchedulerControls";
 export default function ParkingPage() {
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="p-4 flex justify-between align-middle gap-x-4 bg-slate-800 text-white">
+      <div className="p-4 flex justify-between items-center gap-x-4 bg-slate-800 text-white">
         <h1 className="uppercase text-white font-bold font-mono">
           Parking Rotation System
         </h1>
         <a
           href="/parking/today"
-          className="mt-4 lg:mt-0 px-4 py-2 text-xs uppercase font-bold bg-white text-slate-950 rounded hover:bg-gray-200"
+          className="px-4 py-2 text-xs uppercase font-bold bg-white text-slate-950 rounded hover:bg-gray-200"
         >
-          View Today Schedule
+          Schedule Today
         </a>
       </div>
 
