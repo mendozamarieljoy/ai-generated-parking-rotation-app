@@ -15,7 +15,7 @@ export type Slot = "332" | "27" | "28";
 export type SlotAssignment = {
   primary: User | null;
   backup: User | null;
-};
+} | null;
 
 type SlotState = SlotAssignment | null;
 
