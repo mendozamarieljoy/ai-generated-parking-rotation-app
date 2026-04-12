@@ -73,6 +73,7 @@ export default function CompactMode() {
       const formattedDate = dayjs(date).format("YYYY-MM-DD");
       return displaySchedule.find(
         (sched) =>
+          (dayjs().isBefore(date) || dayjs().isSame(date)) &&
           sched.date === formattedDate &&
           Object.values(sched.slots).some((v) => v !== null),
       );
@@ -81,45 +82,29 @@ export default function CompactMode() {
     return filledDatesOnly;
   });
 
-  // const onToggleShowedDates = () => {
-  //   setShowAllDates(!showAllDates);
+  const onToggleShowedDates = () => {
+    setShowAllDates(!showAllDates);
+    const filteredDates = weekdayCalendarDays.filter((date, index) => {
+      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+      const hasSchedule = displaySchedule.find((sched) => {
+        if (showAllDates) {
+          return (
+            (dayjs().isBefore(date) || dayjs().isSame(date)) &&
+            sched.date === formattedDate &&
+            Object.values(sched.slots).some((v) => v !== null)
+          );
+        }
+        return (
+          sched.date === formattedDate &&
+          Object.values(sched.slots).some((v) => v !== null)
+        );
+      });
 
-  //   return weekdayCalendarDays.filter((date, index) => {
-  //     const formattedDate = dayjs(date).format("YYYY-MM-DD");
-  //     return displaySchedule.find(
-  //       (sched) =>
-  //         sched.date === formattedDate &&
-  //         Object.values(sched.slots).some((v) => v !== null),
-  //     );
-  //   });
-  // };
+      return hasSchedule;
+    });
 
-  // const onToggleShowedDates = () => {
-  //   const nextShowAll = !showAllDates;
-  //   setShowAllDates(nextShowAll);
-
-  //   return weekdayCalendarDays.filter((date) => {
-  //     const formattedDate = dayjs(date).format("YYYY-MM-DD");
-
-  //     const hasSchedule = displaySchedule.find(
-  //       (sched) =>
-  //         sched.date === formattedDate &&
-  //         Object.values(sched.slots).some((v) => v !== null),
-  //     );
-
-  //     if (!hasSchedule) return false;
-
-  //     // If NOT showing all, only allow today + future
-  //     if (!nextShowAll) {
-  //       return (
-  //         dayjs(date).isSame(dayjs(), "day") ||
-  //         dayjs(date).isAfter(dayjs(), "day")
-  //       );
-  //     }
-
-  //     return true;
-  //   });
-  // };
+    setShowedSchedules(filteredDates);
+  };
 
   return (
     <>
@@ -135,9 +120,9 @@ export default function CompactMode() {
             <h2>{selectedYear}</h2>
           </div>
           <FilterByUser />
-          {/* <button className="mt-4 text-xs" onClick={onToggleShowedDates}>
-            Show {showAllDates ? "future dates only" : "all dates"}
-          </button> */}
+            <button className="mt-4 text-xs" onClick={onToggleShowedDates}>
+              Show {showAllDates ? "future dates only" : "all dates"}
+            </button>
         </div>
         <div className="flex flex-col gap-4">
           {showedSchedules.map((date, index) =>
