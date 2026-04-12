@@ -43,9 +43,7 @@ export default function ParkingSlot({
             <p className="font-source-sans text-sm font-bold text-slate-800 uppercase tracking-tight">
               {assignment.primary}
             </p>
-            {/* Subtle dot or line for hierarchy */}
-            <div className="w-1 h-1 rounded-full bg-slate-300 my-0.5" />
-            <p className="font-source-sans text-[11px] font-medium text-slate-600 uppercase tracking-wide">
+            <p className="font-source-sans text-sm font-bold text-slate-600 uppercase tracking-wide">
               {assignment.backup}
             </p>
           </>
