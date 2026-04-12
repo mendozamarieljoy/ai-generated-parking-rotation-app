@@ -2,7 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import { useParkingStore } from "@/lib/store";
-import { Slot } from "@/lib/types";
+import { DaySchedule, Slot } from "@/lib/types";
 import dayjs from "dayjs";
 import Modal from "@/components/Modal";
 import ParkingSlot from "@/components/ParkingSlot";
@@ -10,17 +10,42 @@ import Header from "@/components/Header";
 
 export default function TodaySchedulePage() {
   const { schedule, skipPrimary } = useParkingStore();
+  // const [selectedDate, setSelectedDate] = useState(() => {
+  //   const currentDate = dayjs().format("YYYY-MM-DD");
+  //   if (schedule.length > 0) {
+  //     if (schedule[0].date === currentDate) {
+  //       return schedule[0].date;
+  //     } else {
+  //       const found = schedule.find((s) => s.date === currentDate);
+  //       return found ? found.date : schedule[0].date;
+  //     }
+  //   }
+  //   return currentDate;
+  // });
+
   const [selectedDate, setSelectedDate] = useState(() => {
-    const currentDate = dayjs().format("YYYY-MM-DD");
+    const currentDate = dayjs();
+
     if (schedule.length > 0) {
-      if (schedule[0].date === currentDate) {
-        return schedule[0].date;
-      } else {
-        const found = schedule.find((s) => s.date === currentDate);
-        return found ? found.date : schedule[0].date;
-      }
+      // Find nearest date
+      const nearest = schedule.reduce(
+        (closest: DaySchedule | null, item: DaySchedule) => {
+          console.log({ closest, item });
+          const itemDate = dayjs(item.date);
+
+          if (!closest) return item;
+
+          const closestDiff = Math.abs(dayjs(closest.date).diff(currentDate));
+          const itemDiff = Math.abs(itemDate.diff(currentDate));
+
+          return itemDiff < closestDiff ? item : closest;
+        },
+        null,
+      );
+      if (nearest) return nearest.date;
     }
-    return currentDate;
+
+    return currentDate.format("YYYY-MM-DD");
   });
 
   const [toSkipSlot, setToSkipSlot] = useState<{

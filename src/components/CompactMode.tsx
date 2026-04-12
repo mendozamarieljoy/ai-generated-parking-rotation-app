@@ -6,7 +6,7 @@ import { DaySchedule, Slot } from "@/lib/types";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Modal from "./Modal";
 import { getNext12Months } from "@/lib/utils";
 import ParkingSlot from "./ParkingSlot";
@@ -66,14 +66,71 @@ export default function CompactMode() {
     });
   }
 
-  const filledDatesOnly = weekdayCalendarDays.filter((date, index) => {
-    const formattedDate = dayjs(date).format("YYYY-MM-DD");
-    return displaySchedule.find(
-      (sched) =>
-        sched.date === formattedDate &&
-        Object.values(sched.slots).some((v) => v !== null),
-    );
+  const [showAllDates, setShowAllDates] = useState(false);
+
+  const [showedSchedules, setShowedSchedules] = useState(() => {
+    const filledDatesOnly = weekdayCalendarDays.filter((date, index) => {
+      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+      return displaySchedule.find(
+        (sched) =>
+          sched.date === formattedDate &&
+          Object.values(sched.slots).some((v) => v !== null),
+      );
+    });
+
+    return filledDatesOnly;
   });
+
+  // const onToggleShowedDates = () => {
+  //   setShowAllDates(!showAllDates);
+
+  //   if (showAllDates) {
+  //     return weekdayCalendarDays.filter((date, index) => {
+  //       const formattedDate = dayjs(date).format("YYYY-MM-DD");
+  //       return displaySchedule.find(
+  //         (sched) =>
+  //           sched.date === formattedDate &&
+  //           Object.values(sched.slots).some((v) => v !== null),
+  //       );
+  //     });
+  //   } else {
+  //     return weekdayCalendarDays.filter((date, index) => {
+  //       const formattedDate = dayjs(date).format("YYYY-MM-DD");
+  //       return displaySchedule.find(
+  //         (sched) =>
+  //           sched.date === formattedDate &&
+  //           Object.values(sched.slots).some((v) => v !== null),
+  //       );
+  //     });
+  //   }
+  // };
+
+  const onToggleShowedDates = () => {
+    const nextShowAll = !showAllDates;
+    setShowAllDates(nextShowAll);
+
+    return weekdayCalendarDays.filter((date) => {
+      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+
+      const hasSchedule = displaySchedule.find(
+        (sched) =>
+          sched.date === formattedDate &&
+          Object.values(sched.slots).some((v) => v !== null),
+      );
+
+      if (!hasSchedule) return false;
+
+      // If NOT showing all, only allow today + future
+      if (!nextShowAll) {
+        return (
+          dayjs(date).isSame(dayjs(), "day") ||
+          dayjs(date).isAfter(dayjs(), "day")
+        );
+      }
+
+      return true;
+    });
+  };
 
   return (
     <>
@@ -89,9 +146,12 @@ export default function CompactMode() {
             <h2>{selectedYear}</h2>
           </div>
           <FilterByUser />
+          {/* <button className="mt-4 text-xs" onClick={onToggleShowedDates}>
+            Show {showAllDates ? "future dates only" : "all dates"}
+          </button> */}
         </div>
         <div className="flex flex-col gap-4">
-          {filledDatesOnly.map((date, index) =>
+          {showedSchedules.map((date, index) =>
             date ? (
               <div
                 key={index}
@@ -99,10 +159,15 @@ export default function CompactMode() {
               >
                 {date && (
                   <>
-                    <div className="text-sm font-semibold font-sans mb-1">
-                      {dayjs(
-                        `${date.getMonth()}-${date.getDate()}-${date.getFullYear()}`,
-                      ).format("MM-DD-YYYY")}
+                    <div className="flex items-center justify-between text-sm font-semibold font-sans mb-1">
+                      <p>
+                        {dayjs(
+                          `${date.getMonth()}-${date.getDate()}-${date.getFullYear()}`,
+                        ).format("MM-DD-YYYY")}
+                      </p>
+                      <p className="text-gray-500 uppercase text-xs">
+                        {dayjs(date).format("dddd")}
+                      </p>
                     </div>
                     <ParkingSlotWrapper
                       date={date}
