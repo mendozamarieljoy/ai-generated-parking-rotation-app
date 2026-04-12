@@ -190,88 +190,77 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
 
         for (const backupSet of backupOptions) {
           let invalid = false;
+          const day = date.getDay();
+
           const daySlots: Record<Slot, SlotAssignment> = {
             332: { primary: primarySet[0], backup: backupSet[0] },
             27: { primary: primarySet[1], backup: backupSet[1] },
             28: { primary: primarySet[2], backup: backupSet[2] },
           };
 
-          slots.forEach((slot, i) => {
-            const primary = primarySet[i];
-            const backup = backupSet[i];
+          // THEN validate per slot safely
+          for (const slot of slots) {
+            const primary = daySlots[slot] ? daySlots[slot].primary : "";
+            const backup = daySlots[slot] ? daySlots[slot].backup : "";
 
-            // Primary and backup user cannot be the same
+            const assignedUsers = [primary, backup];
+            const has = (name: User) => assignedUsers.includes(name);
+
             if (primary === backup) {
               invalid = true;
+              break;
             }
 
-            invalid =
-              validateMatch(primary, backup, date) ||
-              validateMatch(backup, primary, date);
+            // if (has("Marvs") && has("Erwin") && day === 5) {
+            //   invalid = true;
+            //   break;
+            // }
 
-            if (unavailableSlots.includes(slot)) {
-              // // Erwin arrives 11am during Monday - cannot match with late comers
-              // if ([primary, backup].includes("Erwin")) {
-              //   // Erwin cannot match during Monday with late comers
-              //   if (
-              //     (dayjs(phtDate).day() === 1 &&
-              //       [primary, backup].includes("Nes")) ||
-              //     [primary, backup].includes("Marvs") ||
-              //     [primary, backup].includes("Raph")
-              //   ) {
-              //     invalid = true;
-              //   } else if (
-              //     [primary, backup].includes("Lady") ||
-              //     [primary, backup].includes("Reubs")
-              //   ) {
-              //     // Erwin cannot match with early comers except monday
-              //     invalid = true;
-              //   }
-              // }
-
-              // // Raph cannot match with late comers all week
-              // if (
-              //   [primary, backup].includes("Raph") &&
-              //   ([primary, backup].includes("Nes") ||
-              //     [primary, backup].includes("Marvs"))
-              // ) {
-              //   invalid = true;
-              // }
-
-              // // Nes cannot match with late comers all week
-              // if (
-              //   [primary, backup].includes("Nes") &&
-              //   ([primary, backup].includes("Raph") ||
-              //     [primary, backup].includes("Marvs"))
-              // ) {
-              //   invalid = true;
-              // }
-
-              // // Marvs cannot match with early comers during friday
-              // if (
-              //   dayjs(phtDate).day() === 5 &&
-              //   [primary, backup].includes("Marvs") &&
-              //   ([primary, backup].includes("Lady") ||
-              //     [primary, backup].includes("Erwin") ||
-              //     [primary, backup].includes("Reubs"))
-              // ) {
-              //   invalid = true;
-              // }
-
-              // if (
-              //   [primary, backup].includes("Marvs") &&
-              //   dayjs(phtDate).day() !== 5 &&
-              //   ([primary, backup].includes("Nes") ||
-              //     [primary, backup].includes("Raph"))
-              // ) {
-              //   // Marvs cannot match with late comers except friday
-              //   invalid = true;
-              // }
-
-              daySlots[slot] = null;
-              return;
+            if (has("Nes") && has("Raph")) {
+              invalid = true;
+              break;
             }
-          });
+
+            if (
+              (has("Nes") || has("Raph")) &&
+              has("Marvs") &&
+              day >= 1 &&
+              day <= 4
+            ) {
+              invalid = true;
+              break;
+            }
+
+            if ((has("Nes") || has("Raph")) && has("Erwin") && day === 1) {
+              invalid = true;
+              break;
+            }
+
+            if (has("Lady") && has("Reubs")) {
+              invalid = true;
+              break;
+            }
+
+            if ((has("Lady") || has("Reubs")) && has("Marvs") && day === 5) {
+              invalid = true;
+              break;
+            }
+
+            if (
+              (has("Lady") || has("Reubs")) &&
+              has("Erwin") &&
+              day >= 2 &&
+              day <= 5
+            ) {
+              invalid = true;
+              break;
+            }
+
+            if (has("Mariel") && has("Reubs")) {
+              invalid = true;
+              break;
+            }
+          }
 
           if (invalid) {
             continue;

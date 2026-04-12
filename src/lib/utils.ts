@@ -1,5 +1,6 @@
+import { usersList } from "./constants";
 import { User, Slot, DaySchedule, SlotAssignment, UserStats } from "./types";
-
+import dayjs from "dayjs";
 export function getDaysInMonth(year: number, month: number): Date[] {
   const days: Date[] = [];
   const date = new Date(year, month, 1);
@@ -92,51 +93,85 @@ export function getNext12Months(fromDate = new Date()): MonthOption[] {
   return result;
 }
 
-export function validateMatch(user: User, match: User, date: Date) {
+export function validateMatch(assignedUsers: string[], date: Date) {
+  // const [user, match] = assignedUsers;
+  const cannotMatch: string[] = [];
   const day = date.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
   // let cannotMatchUser: Record<User, User[]> = {};
-  let cannotMatchUser: string[] = [];
   const early = ["Erwin", "Lady", "Reubs", "Marvs"].filter((name) => {
-    if (day === 1) return name !== user && name !== "Erwin";
-    else if (day !== 5) return name !== user && name !== "Marvs";
-    return name !== user;
+    if (day === 1) return !assignedUsers.includes(name) || name !== "Erwin";
+    else if (day !== 5)
+      return !assignedUsers.includes(name) || name !== "Marvs";
+    return !assignedUsers.includes(name);
   });
   const late = ["Nes", "Raph", "Marvs", "Erwin"].filter((name) => {
-    if (day === 5) return name !== user && name !== "Marvs";
-    else if (day !== 1) return name !== user && name !== "Erwin";
-    return name !== user;
+    if (day === 5) return !assignedUsers.includes(name) || name !== "Marvs";
+    else if (day !== 1)
+      return !assignedUsers.includes(name) || name !== "Erwin";
+    return !assignedUsers.includes(name);
   });
 
-  switch (user) {
-    case "Erwin":
-      if (day === 1) cannotMatchUser = late;
-      else cannotMatchUser = early;
-      break;
+  let isInvalid = false;
 
-    case "Marvs":
-      if (day !== 5) cannotMatchUser = late;
-      else cannotMatchUser = early;
-      break;
+  usersList.forEach((user) => {
+    const userIsEarly = early.includes(user);
+    const userIsMid = !early.includes(user) && !late.includes(user);
+    const userIsLate = late.includes(user);
+    const matchedUser: string | undefined = assignedUsers.find(
+      (name) => name !== user,
+    );
 
-    case "Raph":
-    case "Nes":
-      cannotMatchUser = late;
-      break;
-
-    case "Reubs":
-    case "Lady":
-      cannotMatchUser = early;
-      break;
-
-    case "Mariel":
-      cannotMatchUser = ["Reubs"];
-      break;
-
-    default:
-      break;
-  }
-
-  const isInvalid = cannotMatchUser.includes(match);
+    if (userIsEarly && assignedUsers.includes(user)) {
+      if (matchedUser) isInvalid = early.includes(matchedUser);
+    } else if (userIsLate && assignedUsers.includes(user)) {
+      if (matchedUser) isInvalid = late.includes(matchedUser);
+    } else if (userIsMid) {
+      if (user === "Mariel") {
+        isInvalid = matchedUser === "Reubs";
+      }
+    }
+  });
 
   return isInvalid;
+
+  // switch (user || match) {
+  //   case "Raph":
+  //   case "Nes":
+  //     cannotMatch = late;
+  //     // return late.some((name) => assignedUsers.includes(name));
+  //     break;
+  //   case "Reubs":
+  //   case "Lady":
+  //     cannotMatch = early;
+  //     break;
+  //   // return early.some((name) => assignedUsers.includes(name));
+
+  //   case "Mariel":
+  //     cannotMatch.push("Reubs");
+  //     break;
+  //   // return match === "Reubs";
+
+  //   case "Erwin":
+  //     // if (day === 1) return late.some((name) => assignedUsers.includes(name));
+  //     // else return early.some((name) => assignedUsers.includes(name));
+
+  //     if (day === 1) cannotMatch = late;
+  //     else cannotMatch = early;
+  //     break;
+
+  //   case "Marvs":
+  //     // if (day !== 5) return late.some((name) => assignedUsers.includes(name));
+  //     // else return early.some((name) => assignedUsers.includes(name));
+
+  //     if (day === 5) cannotMatch = late;
+  //     else cannotMatch = early;
+  //     break;
+
+  //   default:
+  //     break;
+  // }
+
+  return assignedUsers.some((name) => cannotMatch.includes(name));
 }
+
+// utils/validation.js
