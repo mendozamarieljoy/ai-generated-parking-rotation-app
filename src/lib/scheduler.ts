@@ -12,6 +12,7 @@ import {
   getDayName,
   isWeekend,
   isHoliday,
+  validateMatch,
 } from "./utils";
 
 import dayjs from "dayjs";
@@ -199,16 +200,74 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
             const primary = primarySet[i];
             const backup = backupSet[i];
 
+            // Primary and backup user cannot be the same
             if (primary === backup) {
               invalid = true;
             }
-            if (
-              [primary, backup].includes("Erwin") &&
-              [primary, backup].includes("Lady")
-            ) {
-              invalid = true;
-            }
+
+            invalid =
+              validateMatch(primary, backup, date) ||
+              validateMatch(backup, primary, date);
+
             if (unavailableSlots.includes(slot)) {
+              // // Erwin arrives 11am during Monday - cannot match with late comers
+              // if ([primary, backup].includes("Erwin")) {
+              //   // Erwin cannot match during Monday with late comers
+              //   if (
+              //     (dayjs(phtDate).day() === 1 &&
+              //       [primary, backup].includes("Nes")) ||
+              //     [primary, backup].includes("Marvs") ||
+              //     [primary, backup].includes("Raph")
+              //   ) {
+              //     invalid = true;
+              //   } else if (
+              //     [primary, backup].includes("Lady") ||
+              //     [primary, backup].includes("Reubs")
+              //   ) {
+              //     // Erwin cannot match with early comers except monday
+              //     invalid = true;
+              //   }
+              // }
+
+              // // Raph cannot match with late comers all week
+              // if (
+              //   [primary, backup].includes("Raph") &&
+              //   ([primary, backup].includes("Nes") ||
+              //     [primary, backup].includes("Marvs"))
+              // ) {
+              //   invalid = true;
+              // }
+
+              // // Nes cannot match with late comers all week
+              // if (
+              //   [primary, backup].includes("Nes") &&
+              //   ([primary, backup].includes("Raph") ||
+              //     [primary, backup].includes("Marvs"))
+              // ) {
+              //   invalid = true;
+              // }
+
+              // // Marvs cannot match with early comers during friday
+              // if (
+              //   dayjs(phtDate).day() === 5 &&
+              //   [primary, backup].includes("Marvs") &&
+              //   ([primary, backup].includes("Lady") ||
+              //     [primary, backup].includes("Erwin") ||
+              //     [primary, backup].includes("Reubs"))
+              // ) {
+              //   invalid = true;
+              // }
+
+              // if (
+              //   [primary, backup].includes("Marvs") &&
+              //   dayjs(phtDate).day() !== 5 &&
+              //   ([primary, backup].includes("Nes") ||
+              //     [primary, backup].includes("Raph"))
+              // ) {
+              //   // Marvs cannot match with late comers except friday
+              //   invalid = true;
+              // }
+
               daySlots[slot] = null;
               return;
             }

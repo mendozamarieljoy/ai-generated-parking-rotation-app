@@ -84,53 +84,42 @@ export default function CompactMode() {
   // const onToggleShowedDates = () => {
   //   setShowAllDates(!showAllDates);
 
-  //   if (showAllDates) {
-  //     return weekdayCalendarDays.filter((date, index) => {
-  //       const formattedDate = dayjs(date).format("YYYY-MM-DD");
-  //       return displaySchedule.find(
-  //         (sched) =>
-  //           sched.date === formattedDate &&
-  //           Object.values(sched.slots).some((v) => v !== null),
-  //       );
-  //     });
-  //   } else {
-  //     return weekdayCalendarDays.filter((date, index) => {
-  //       const formattedDate = dayjs(date).format("YYYY-MM-DD");
-  //       return displaySchedule.find(
-  //         (sched) =>
-  //           sched.date === formattedDate &&
-  //           Object.values(sched.slots).some((v) => v !== null),
-  //       );
-  //     });
-  //   }
+  //   return weekdayCalendarDays.filter((date, index) => {
+  //     const formattedDate = dayjs(date).format("YYYY-MM-DD");
+  //     return displaySchedule.find(
+  //       (sched) =>
+  //         sched.date === formattedDate &&
+  //         Object.values(sched.slots).some((v) => v !== null),
+  //     );
+  //   });
   // };
 
-  const onToggleShowedDates = () => {
-    const nextShowAll = !showAllDates;
-    setShowAllDates(nextShowAll);
+  // const onToggleShowedDates = () => {
+  //   const nextShowAll = !showAllDates;
+  //   setShowAllDates(nextShowAll);
 
-    return weekdayCalendarDays.filter((date) => {
-      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+  //   return weekdayCalendarDays.filter((date) => {
+  //     const formattedDate = dayjs(date).format("YYYY-MM-DD");
 
-      const hasSchedule = displaySchedule.find(
-        (sched) =>
-          sched.date === formattedDate &&
-          Object.values(sched.slots).some((v) => v !== null),
-      );
+  //     const hasSchedule = displaySchedule.find(
+  //       (sched) =>
+  //         sched.date === formattedDate &&
+  //         Object.values(sched.slots).some((v) => v !== null),
+  //     );
 
-      if (!hasSchedule) return false;
+  //     if (!hasSchedule) return false;
 
-      // If NOT showing all, only allow today + future
-      if (!nextShowAll) {
-        return (
-          dayjs(date).isSame(dayjs(), "day") ||
-          dayjs(date).isAfter(dayjs(), "day")
-        );
-      }
+  //     // If NOT showing all, only allow today + future
+  //     if (!nextShowAll) {
+  //       return (
+  //         dayjs(date).isSame(dayjs(), "day") ||
+  //         dayjs(date).isAfter(dayjs(), "day")
+  //       );
+  //     }
 
-      return true;
-    });
-  };
+  //     return true;
+  //   });
+  // };
 
   return (
     <>

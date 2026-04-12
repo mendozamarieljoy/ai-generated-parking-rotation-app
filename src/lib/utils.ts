@@ -13,8 +13,6 @@ export function getDaysInMonth(year: number, month: number): Date[] {
 export function isAvailable(user: User, date: Date): boolean {
   const day = date.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
   switch (user) {
-    case "Marvs":
-      return day !== 4; // no Thursday
     case "Reubs":
       return day !== 2; // no Tuesday
     case "Mariel":
@@ -92,4 +90,53 @@ export function getNext12Months(fromDate = new Date()): MonthOption[] {
   }
 
   return result;
+}
+
+export function validateMatch(user: User, match: User, date: Date) {
+  const day = date.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  // let cannotMatchUser: Record<User, User[]> = {};
+  let cannotMatchUser: string[] = [];
+  const early = ["Erwin", "Lady", "Reubs", "Marvs"].filter((name) => {
+    if (day === 1) return name !== user && name !== "Erwin";
+    else if (day !== 5) return name !== user && name !== "Marvs";
+    return name !== user;
+  });
+  const late = ["Nes", "Raph", "Marvs", "Erwin"].filter((name) => {
+    if (day === 5) return name !== user && name !== "Marvs";
+    else if (day !== 1) return name !== user && name !== "Erwin";
+    return name !== user;
+  });
+
+  switch (user) {
+    case "Erwin":
+      if (day === 1) cannotMatchUser = late;
+      else cannotMatchUser = early;
+      break;
+
+    case "Marvs":
+      if (day !== 5) cannotMatchUser = late;
+      else cannotMatchUser = early;
+      break;
+
+    case "Raph":
+    case "Nes":
+      cannotMatchUser = late;
+      break;
+
+    case "Reubs":
+    case "Lady":
+      cannotMatchUser = early;
+      break;
+
+    case "Mariel":
+      cannotMatchUser = ["Reubs"];
+      break;
+
+    default:
+      break;
+  }
+
+  const isInvalid = cannotMatchUser.includes(match);
+
+  return isInvalid;
 }
