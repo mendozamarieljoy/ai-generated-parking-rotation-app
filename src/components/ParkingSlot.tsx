@@ -51,7 +51,7 @@ export default function ParkingSlot({
           </>
         ) : (
           <p className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-center px-2">
-            Owner Use
+            Not available
           </p>
         )}
       </div>

@@ -28,6 +28,16 @@ const unavailableSlotsByDate: UnavailableSlotsByDate = {
   "2026-04-08": ["332"],
   "2026-04-09": ["332"],
   "2026-04-10": ["332"],
+  "2026-04-13": ["332"],
+  "2026-04-14": ["332"],
+  "2026-04-15": ["332"],
+  "2026-04-16": ["332"],
+  "2026-04-17": ["332"],
+  "2026-04-20": ["332"],
+  "2026-04-21": ["332"],
+  "2026-04-22": ["332"],
+  "2026-04-23": ["332"],
+  "2026-04-24": ["332"],
 };
 
 function getCombinations<T>(arr: T[], k: number): T[][] {
@@ -192,7 +202,10 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
             if (primary === backup) {
               invalid = true;
             }
-            if (primary === "Erwin" && backup === "Lady") {
+            if (
+              [primary, backup].includes("Erwin") &&
+              [primary, backup].includes("Lady")
+            ) {
               invalid = true;
             }
             if (unavailableSlots.includes(slot)) {
