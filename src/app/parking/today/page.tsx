@@ -24,13 +24,12 @@ export default function TodaySchedulePage() {
   // });
 
   const [selectedDate, setSelectedDate] = useState(() => {
-    const currentDate = dayjs();
+    const currentDate = dayjs().format("YYYY-MM-DD");
 
     if (schedule.length > 0) {
       // Find nearest date
       const nearest = schedule.reduce(
         (closest: DaySchedule | null, item: DaySchedule) => {
-          console.log({ closest, item });
           const itemDate = dayjs(item.date);
 
           if (!closest) return item;
@@ -42,10 +41,15 @@ export default function TodaySchedulePage() {
         },
         null,
       );
+
+      if (schedule.find((s) => s.date === currentDate)) {
+        return currentDate;
+      }
+
       if (nearest) return nearest.date;
     }
 
-    return currentDate.format("YYYY-MM-DD");
+    return currentDate;
   });
 
   const [toSkipSlot, setToSkipSlot] = useState<{

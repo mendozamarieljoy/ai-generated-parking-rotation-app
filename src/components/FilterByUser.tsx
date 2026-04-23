@@ -25,7 +25,7 @@ export default function FilterByUser() {
           return (
             <button
               key={user}
-              className={`${isUserFiltered ? primaryUserColor[user] : "text-slate-200"} bg-current text-xs px-4 py-2 rounded-xl`}
+              className={`${isUserFiltered ? "" : "opacity-20"} ${primaryUserColor[user]} bg-current text-xs px-4 py-2 rounded-xl`}
               onClick={() => onHandleClick(isUserFiltered, user)}
             >
               <span className="text-white">{user}</span>

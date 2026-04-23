@@ -6,7 +6,7 @@ import { DaySchedule, Slot } from "@/lib/types";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Modal from "./Modal";
 import { getNext12Months } from "@/lib/utils";
 import ParkingSlot from "./ParkingSlot";
@@ -36,7 +36,6 @@ export default function CompactMode() {
     slot: Slot;
   } | null>(null);
 
-  // Get April 2026 calendar
   const year = selectedYear;
   const month = selectedMonth; // Month is 0-indexed
   const firstDay = new Date(year, month, 1);
@@ -55,45 +54,41 @@ export default function CompactMode() {
     current.setDate(current.getDate() + 1);
   }
 
-  const weekdayCalendarDays = [] as (Date | null)[];
-  for (let i = 0; i < calendarDays.length; i += 7) {
-    const week = calendarDays.slice(i, i + 7);
-    week.forEach((date, idx) => {
-      // keep only Mon-Fri
-      if (idx >= 1 && idx <= 5) {
-        weekdayCalendarDays.push(date);
-      }
-    });
-  }
+  const weekdayCalendarDays = useMemo(() => {
+    const result: (Date | null)[] = [];
 
-  const [showAllDates, setShowAllDates] = useState(false);
+    for (let i = 0; i < calendarDays.length; i += 7) {
+      const week = calendarDays.slice(i, i + 7);
 
-  const [showedSchedules, setShowedSchedules] = useState(() => {
-    const filledDatesOnly = weekdayCalendarDays.filter((date, index) => {
-      const formattedDate = dayjs(date).format("YYYY-MM-DD");
-      return displaySchedule.find(
-        (sched) =>
-          (dayjs().isBefore(date) || dayjs().isSame(date)) &&
-          sched.date === formattedDate &&
-          Object.values(sched.slots).some((v) => v !== null),
-      );
-    });
+      week.forEach((date, idx) => {
+        // keep only Mon-Fri
+        if (idx >= 1 && idx <= 5) {
+          result.push(date);
+        }
+      });
+    }
 
-    return filledDatesOnly;
-  });
+    return result;
+  }, [calendarDays]);
 
-  const onToggleShowedDates = () => {
-    setShowAllDates(!showAllDates);
-    const filteredDates = weekdayCalendarDays.filter((date, index) => {
+  const [showUpcomingDates, setShowUpcomingDates] = useState(true);
+
+  const compareDate = (date: Date | null, sched: DaySchedule) => {
+    if (!date) return false;
+    const DATE_FORMAT = "YYYY-MM-DD";
+    const formattedDate = dayjs(date).format(DATE_FORMAT);
+    return (
+      (dayjs().isBefore(date) || dayjs().isSame(dayjs(date), "day")) &&
+      sched.date === formattedDate &&
+      Object.values(sched.slots).some((v) => v !== null)
+    );
+  };
+
+  const showedSchedules = useMemo(() => {
+    return weekdayCalendarDays.filter((date) => {
       const formattedDate = dayjs(date).format("YYYY-MM-DD");
       const hasSchedule = displaySchedule.find((sched) => {
-        if (showAllDates) {
-          return (
-            (dayjs().isBefore(date) || dayjs().isSame(date)) &&
-            sched.date === formattedDate &&
-            Object.values(sched.slots).some((v) => v !== null)
-          );
-        }
+        if (!showUpcomingDates) return compareDate(date, sched);
         return (
           sched.date === formattedDate &&
           Object.values(sched.slots).some((v) => v !== null)
@@ -102,9 +97,7 @@ export default function CompactMode() {
 
       return hasSchedule;
     });
-
-    setShowedSchedules(filteredDates);
-  };
+  }, [weekdayCalendarDays, displaySchedule, showUpcomingDates]);
 
   return (
     <>
@@ -120,9 +113,12 @@ export default function CompactMode() {
             <h2>{selectedYear}</h2>
           </div>
           <FilterByUser />
-            <button className="mt-4 text-xs" onClick={onToggleShowedDates}>
-              Show {showAllDates ? "future dates only" : "all dates"}
-            </button>
+          <button
+            className="text-xs mt-4"
+            onClick={() => setShowUpcomingDates(!showUpcomingDates)}
+          >
+            Show {showUpcomingDates ? "upcoming dates" : "past dates"}
+          </button>
         </div>
         <div className="flex flex-col gap-4">
           {showedSchedules.map((date, index) =>
@@ -134,12 +130,8 @@ export default function CompactMode() {
                 {date && (
                   <>
                     <div className="flex items-center justify-between text-sm font-semibold font-sans mb-1">
-                      <p>
-                        {dayjs(
-                          `${date.getMonth()}-${date.getDate()}-${date.getFullYear()}`,
-                        ).format("MM-DD-YYYY")}
-                      </p>
-                      <p className="text-gray-500 uppercase text-xs">
+                      <p>{dayjs(date).format("MM-DD-YYYY")}</p>
+                      <p className="text-black uppercase text-xs">
                         {dayjs(date).format("dddd")}
                       </p>
                     </div>

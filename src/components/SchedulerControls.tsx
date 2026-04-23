@@ -3,7 +3,8 @@
 import { useParkingStore } from "@/lib/store";
 import { domToPng } from "modern-screenshot";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useOnClickOutside } from "@/hooks/hooks";
 
 const DownloadIcon = () => (
   <svg
@@ -52,7 +53,7 @@ const ImageIcon = () => (
 );
 
 export default function SchedulerControls() {
-  const { regenerateSchedule } = useParkingStore();
+  const { regenerateSchedule, selectedMonth, selectedYear } = useParkingStore();
 
   const exportSchedule = () => {
     const { schedule } = useParkingStore.getState();
@@ -94,8 +95,12 @@ export default function SchedulerControls() {
       // Inside this block, 'el' is guaranteed to be a Node/HTMLElement
       // const dataUrl = await domToPng(el);
 
+      const monthYear = `${dayjs(`${selectedMonth + 1}-30-${selectedYear}`)
+        .format("MMM YYYY")
+        .toUpperCase()}`;
+
       const link = document.createElement("a");
-      link.download = `export-parking-rotation-${dayjs().format("YYYYMMDDhhmmss")}.png`;
+      link.download = `${monthYear} Parking Schedule d${dayjs().format("YYYYMMDDhhmmss")}.png`;
       link.href = dataUrl;
       link.click();
     } else {
@@ -105,6 +110,10 @@ export default function SchedulerControls() {
     }
   };
   const [isOpen, setIsOpen] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside(dropdownRef, () => setIsOpen(false));
 
   return (
     <div className="relative inline-block text-left">
@@ -134,28 +143,34 @@ export default function SchedulerControls() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden">
+        <div
+          ref={dropdownRef}
+          className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden"
+        >
           <div className="py-1">
             <button
-              onClick={() => {
-                exportSchedule();
-                setIsOpen(false);
-              }}
-              className="flex items-center gap-3 w-full px-4 py-3 text-xs font-inter font-bold text-slate-700 hover:bg-slate-50 transition-colors border-b border-slate-100"
-            >
-              <JsonIcon />
-              <span className="uppercase tracking-tight">Save as JSON</span>
-            </button>
-
-            <button
+              className="flex items-center gap-3 w-full px-4 py-3 text-xs font-inter font-bold text-slate-700 hover:bg-slate-50 transition-colors"
               onClick={() => {
                 exportCalendar();
                 setIsOpen(false);
               }}
-              className="flex items-center gap-3 w-full px-4 py-3 text-xs font-inter font-bold text-slate-700 hover:bg-slate-50 transition-colors"
             >
               <ImageIcon />
               <span className="uppercase tracking-tight">Save as Image</span>
+            </button>
+            <p className="text-xs pb-2 px-4 text-red-500 italic">
+              Note: Switch to desktop view to save as image
+            </p>
+
+            <button
+              className="flex items-center gap-3 w-full px-4 py-3 text-xs font-inter font-bold text-slate-700 hover:bg-slate-50 transition-colors border-t border-slate-100"
+              onClick={() => {
+                exportSchedule();
+                setIsOpen(false);
+              }}
+            >
+              <JsonIcon />
+              <span className="uppercase tracking-tight">Save as JSON</span>
             </button>
           </div>
         </div>

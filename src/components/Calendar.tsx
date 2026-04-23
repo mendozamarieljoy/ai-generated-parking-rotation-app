@@ -119,7 +119,7 @@ export default function Calendar() {
             >
               {date && (
                 <>
-                  <div className="text-sm font-sans font-semibold mb-1">
+                  <div className="text-sm font-sans font-semibold mb-1 text-black">
                     {date.getDate()}
                   </div>
                   <ParkingSlotWrapper date={date} innerClassName="max-w-1/3" />
