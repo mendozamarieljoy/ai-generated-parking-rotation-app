@@ -71,7 +71,7 @@ export default function CompactMode() {
     return result;
   }, [calendarDays]);
 
-  const [showUpcomingDates, setShowUpcomingDates] = useState(true);
+  const [showUpcomingDates, setShowUpcomingDates] = useState(false);
 
   const compareDate = (date: Date | null, sched: DaySchedule) => {
     if (!date) return false;
@@ -131,7 +131,7 @@ export default function CompactMode() {
                   <>
                     <div className="flex items-center justify-between text-sm font-semibold font-sans mb-1">
                       <p>{dayjs(date).format("MM-DD-YYYY")}</p>
-                      <p className="text-black uppercase text-xs">
+                      <p className="text-slate-800 uppercase text-xs">
                         {dayjs(date).format("dddd")}
                       </p>
                     </div>
