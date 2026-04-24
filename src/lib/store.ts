@@ -33,12 +33,9 @@ const OUTSIDE_PARKING_COST = 100; // assume
 function calculateUserStats(
   schedule: DaySchedule[],
 ): Record<string, UserStats> {
-  const stats: Record<
-    string,
-    { primary: number; backup: number; slot332: number }
-  > = {};
+  const stats: Record<string, { primary: number; backup: number }> = {};
   users.forEach((user) => {
-    stats[user] = { primary: 0, backup: 0, slot332: 0 };
+    stats[user] = { primary: 0, backup: 0 };
   });
 
   schedule.forEach((day) => {
@@ -61,7 +58,6 @@ function calculateUserStats(
     userStats[user] = {
       primaryCount: s.primary,
       backupCount: s.backup,
-      slot332Count: s.slot332,
       fairnessScore: calculateFairnessScore(s),
     };
   });
@@ -82,7 +78,6 @@ function calculateCostStats(
     const benefit = calculateBenefitScore(
       stats.primaryCount,
       stats.backupCount,
-      stats.slot332Count,
     );
     const estimatedCost = costPerUser;
     const savings =
@@ -296,7 +291,6 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
     const { schedule } = get();
     const filteredSchedule = [...schedule].map((daySchedule) => {
       const updatedSlots: DaySlots = {
-        332: null,
         27: null,
         28: null,
       };

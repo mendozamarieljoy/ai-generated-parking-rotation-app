@@ -93,11 +93,10 @@ function getPartialPermutations<T>(arr: T[], size: number): T[][] {
 }
 
 function evaluateFairnessScore(
-  stats: Record<User, { primary: number; backup: number; slot332: number }>,
+  stats: Record<User, { primary: number; backup: number }>,
 ): number {
   const userValues = users.map(
-    (user) =>
-      stats[user].primary * 2 + stats[user].backup - stats[user].slot332 * 1.5,
+    (user) => stats[user].primary * 2 + stats[user].backup,
   );
 
   const maxValue = Math.max(...userValues);
@@ -105,19 +104,12 @@ function evaluateFairnessScore(
 
   const primaryCounts = users.map((user) => stats[user].primary);
   const backupCounts = users.map((user) => stats[user].backup);
-  const slot332Counts = users.map((user) => stats[user].slot332);
 
   const rangePrimary = Math.max(...primaryCounts) - Math.min(...primaryCounts);
   const rangeBackup = Math.max(...backupCounts) - Math.min(...backupCounts);
-  const range332 = Math.max(...slot332Counts) - Math.min(...slot332Counts);
 
   // Weight by how close the composite score is across users first, then by distribution stability.
-  return (
-    (maxValue - minValue) * 1000 +
-    rangePrimary * 100 +
-    rangeBackup * 10 +
-    range332
-  );
+  return (maxValue - minValue) * 1000 + rangePrimary * 100 + rangeBackup * 10;
 }
 
 export function generateSchedule(year: number, month: number): DaySchedule[] {
@@ -132,12 +124,9 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
   const schedule: DaySchedule[] = [];
 
   // Track usage for fairness
-  const userStats = {} as Record<
-    User,
-    { primary: number; backup: number; slot332: number }
-  >;
+  const userStats = {} as Record<User, { primary: number; backup: number }>;
   users.forEach((user) => {
-    userStats[user] = { primary: 0, backup: 0, slot332: 0 };
+    userStats[user] = { primary: 0, backup: 0 };
   });
 
   for (const date of days) {
@@ -255,10 +244,7 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
               acc[user] = { ...userStats[user] };
               return acc;
             },
-            {} as Record<
-              User,
-              { primary: number; backup: number; slot332: number }
-            >,
+            {} as Record<User, { primary: number; backup: number }>,
           );
 
           slots.forEach((slot, i) => {

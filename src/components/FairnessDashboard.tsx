@@ -33,7 +33,6 @@ export default function FairnessDashboard() {
                 <div className="flex justify-between text-sm">
                   <span>Primary: {stats.primaryCount}</span>
                   <span>Backup: {stats.backupCount}</span>
-                  <span>332: {stats.slot332Count}</span>
                 </div>
               </div>
             </div>

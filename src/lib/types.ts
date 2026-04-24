@@ -31,7 +31,6 @@ export type DaySchedule = {
 export type UserStats = {
   primaryCount: number;
   backupCount: number;
-  slot332Count: number;
   fairnessScore: number;
 };
 

@@ -28,17 +28,12 @@ export function isAvailable(user: User, date: Date): boolean {
 export function calculateFairnessScore(stats: {
   primary: number;
   backup: number;
-  slot332: number;
 }): number {
-  return stats.primary * 2 + stats.backup * 1 - stats.slot332 * 1.5;
+  return stats.primary * 2 + stats.backup * 1;
 }
 
-export function calculateBenefitScore(
-  primary: number,
-  backup: number,
-  slot332: number,
-): number {
-  return primary * 1 + backup * 0.5 + slot332 * 0.25;
+export function calculateBenefitScore(primary: number, backup: number): number {
+  return primary * 1 + backup * 0.5;
 }
 
 export function isHoliday(date: Date): boolean {
