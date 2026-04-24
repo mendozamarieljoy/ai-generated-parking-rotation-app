@@ -48,9 +48,6 @@ function calculateUserStats(
       }
       if (slot?.primary) {
         stats[slot.primary].primary++;
-        if (slotKey === "332") {
-          stats[slot.primary].slot332++;
-        }
       }
       if (slot?.backup) {
         stats[slot.backup].backup++;

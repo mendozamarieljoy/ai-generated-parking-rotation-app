@@ -19,31 +19,12 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
-const slots: Slot[] = ["332", "27", "28"];
+const slots: Slot[] = ["27", "28"];
 
 type UnavailableSlotsByDate = Record<string, Slot[]>;
 
-const unavailableSlotsByDate: UnavailableSlotsByDate = {
-  "2026-04-06": ["332"],
-  "2026-04-07": ["332"],
-  "2026-04-08": ["332"],
-  "2026-04-09": ["332"],
-  "2026-04-10": ["332"],
-  "2026-04-13": ["332"],
-  "2026-04-14": ["332"],
-  "2026-04-15": ["332"],
-  "2026-04-16": ["332"],
-  "2026-04-17": ["332"],
-  "2026-04-20": ["332"],
-  "2026-04-21": ["332"],
-  "2026-04-22": ["332"],
-  "2026-04-23": ["332"],
-  "2026-04-24": ["332"],
-  "2026-04-27": ["332"],
-  "2026-04-28": ["332"],
-  "2026-04-29": ["332"],
-  "2026-04-30": ["332"],
-};
+// ADD DATES WITH UNAVAILABLE SLOTS: "YYYY-MM-DD": ["SLOT NUMBER"],
+const unavailableSlotsByDate: UnavailableSlotsByDate = {};
 
 function getCombinations<T>(arr: T[], k: number): T[][] {
   const result: T[][] = [];
@@ -197,17 +178,9 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
           const day = date.getDay();
 
           const daySlots: Record<Slot, SlotAssignment> = {
-            332: { primary: primarySet[0], backup: backupSet[0] },
             27: { primary: primarySet[1], backup: backupSet[1] },
             28: { primary: primarySet[2], backup: backupSet[2] },
           };
-
-          // if (date.getMonth() > 3) {
-          //   daySlots = {
-          //     27: { primary: primarySet[0], backup: backupSet[0] },
-          //     28: { primary: primarySet[1], backup: backupSet[1] },
-          //   };
-          // }
 
           // THEN validate per slot safely
           for (const slot of slots) {
@@ -295,9 +268,6 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
             projectedStats[primary].primary += 1;
             projectedStats[backup].backup += 1;
 
-            if (slot === "332") {
-              projectedStats[primary].slot332 += 1;
-            }
             if (unavailableSlots.includes(slot)) {
               daySlots[slot] = null;
               return;
@@ -323,9 +293,6 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
       if (slotValue) {
         userStats[slotValue.primary!].primary += 1;
         userStats[slotValue.backup!].backup += 1;
-        if (slot === "332") {
-          userStats[slotValue.primary!].slot332 += 1;
-        }
       }
     });
 
