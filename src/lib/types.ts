@@ -10,7 +10,7 @@ export const users = [
 
 export type User = (typeof users)[number];
 
-export type Slot = "332" | "27" | "28";
+export type Slot = "27" | "28";
 
 export type SlotAssignment = {
   primary: User | null;
@@ -31,7 +31,6 @@ export type DaySchedule = {
 export type UserStats = {
   primaryCount: number;
   backupCount: number;
-  slot332Count: number;
   fairnessScore: number;
 };
 
