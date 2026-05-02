@@ -21,6 +21,8 @@ export default function ParkingSlot({
       [assignment?.primary, assignment?.backup].includes(u),
     );
 
+  if (!isAvailable) return <></>;
+
   return (
     <div
       className={`${isFilteredOut && "visibility-0 opacity-0"} border-t-3 w-full h-full flex flex-col overflow-hidden transition-all ${className} ${

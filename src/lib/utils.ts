@@ -42,7 +42,12 @@ export function isHoliday(date: Date): boolean {
   // Philippine holidays in April 2026 - only Araw ng Kagitingan
   const holidays = [
     { month: 4, day: 9 }, // Araw ng Kagitingan (Regular Holiday)
-		{ month: 5, day: 1 }, // Labor day
+    { month: 5, day: 1 }, // Labor day (Regular Holiday)
+    { month: 6, day: 12 }, // Independence Day (Regular Holiday)
+    { month: 8, day: 31 }, // National Heroes Day  (Regular Holiday)
+    { month: 11, day: 30 }, // Bonifacio Day  (Regular Holiday)
+    { month: 12, day: 25 }, // Christmas Day  (Regular Holiday)
+    { month: 12, day: 30 }, // Rizal Day  (Regular Holiday)
   ];
   return holidays.some((h) => h.month === month && h.day === day);
 }
@@ -88,86 +93,3 @@ export function getNext12Months(fromDate = new Date()): MonthOption[] {
 
   return result;
 }
-
-export function validateMatch(assignedUsers: string[], date: Date) {
-  // const [user, match] = assignedUsers;
-  const cannotMatch: string[] = [];
-  const day = date.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
-  // let cannotMatchUser: Record<User, User[]> = {};
-  const early = ["Erwin", "Lady", "Reubs", "Marvs"].filter((name) => {
-    if (day === 1) return !assignedUsers.includes(name) || name !== "Erwin";
-    else if (day !== 5)
-      return !assignedUsers.includes(name) || name !== "Marvs";
-    return !assignedUsers.includes(name);
-  });
-  const late = ["Nes", "Raph", "Marvs", "Erwin"].filter((name) => {
-    if (day === 5) return !assignedUsers.includes(name) || name !== "Marvs";
-    else if (day !== 1)
-      return !assignedUsers.includes(name) || name !== "Erwin";
-    return !assignedUsers.includes(name);
-  });
-
-  let isInvalid = false;
-
-  usersList.forEach((user) => {
-    const userIsEarly = early.includes(user);
-    const userIsMid = !early.includes(user) && !late.includes(user);
-    const userIsLate = late.includes(user);
-    const matchedUser: string | undefined = assignedUsers.find(
-      (name) => name !== user,
-    );
-
-    if (userIsEarly && assignedUsers.includes(user)) {
-      if (matchedUser) isInvalid = early.includes(matchedUser);
-    } else if (userIsLate && assignedUsers.includes(user)) {
-      if (matchedUser) isInvalid = late.includes(matchedUser);
-    } else if (userIsMid) {
-      if (user === "Mariel") {
-        isInvalid = matchedUser === "Reubs";
-      }
-    }
-  });
-
-  return isInvalid;
-
-  // switch (user || match) {
-  //   case "Raph":
-  //   case "Nes":
-  //     cannotMatch = late;
-  //     // return late.some((name) => assignedUsers.includes(name));
-  //     break;
-  //   case "Reubs":
-  //   case "Lady":
-  //     cannotMatch = early;
-  //     break;
-  //   // return early.some((name) => assignedUsers.includes(name));
-
-  //   case "Mariel":
-  //     cannotMatch.push("Reubs");
-  //     break;
-  //   // return match === "Reubs";
-
-  //   case "Erwin":
-  //     // if (day === 1) return late.some((name) => assignedUsers.includes(name));
-  //     // else return early.some((name) => assignedUsers.includes(name));
-
-  //     if (day === 1) cannotMatch = late;
-  //     else cannotMatch = early;
-  //     break;
-
-  //   case "Marvs":
-  //     // if (day !== 5) return late.some((name) => assignedUsers.includes(name));
-  //     // else return early.some((name) => assignedUsers.includes(name));
-
-  //     if (day === 5) cannotMatch = late;
-  //     else cannotMatch = early;
-  //     break;
-
-  //   default:
-  //     break;
-  // }
-
-  return assignedUsers.some((name) => cannotMatch.includes(name));
-}
-
-// utils/validation.js
