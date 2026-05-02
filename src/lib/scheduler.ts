@@ -119,14 +119,9 @@ function evaluateFairnessScore(
 }
 
 export function generateSchedule(year: number, month: number): DaySchedule[] {
-  const days = getDaysInMonth(year, month)
-    .filter((date) => !isWeekend(date) && !isHoliday(date))
-    .filter((date) => {
-      if (month === 3) {
-        const day = date.getDate();
-        return day > 5; // exclude April 1-5
-      } else return true;
-    });
+  const days = getDaysInMonth(year, month).filter(
+    (date) => !isWeekend(date) && !isHoliday(date),
+  );
   const schedule: DaySchedule[] = [];
 
   // Track usage for fairness
