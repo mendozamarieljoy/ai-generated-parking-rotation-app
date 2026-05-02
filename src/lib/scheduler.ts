@@ -202,15 +202,12 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
             28: { primary: primarySet[2], backup: backupSet[2] },
           };
 
-          // if (date.getMonth() > 3) {
-          //   daySlots = {
-          //     27: { primary: primarySet[0], backup: backupSet[0] },
-          //     28: { primary: primarySet[1], backup: backupSet[1] },
-          //   };
-          // }
-
           // THEN validate per slot safely
           for (const slot of slots) {
+            if (slot === "332") {
+              daySlots[slot] = null;
+              continue;
+            }
             const primary = daySlots[slot] ? daySlots[slot].primary : "";
             const backup = daySlots[slot] ? daySlots[slot].backup : "";
 
@@ -222,51 +219,48 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
               break;
             }
 
-            // if (has("Marvs") && has("Erwin") && day === 5) {
-            //   invalid = true;
-            //   break;
-            // }
-
+            // AFTERNOON CONSTRAINTS
             if (has("Nes") && has("Raph")) {
               invalid = true;
               break;
             }
 
-            if (
-              (has("Nes") || has("Raph")) &&
-              has("Marvs") &&
-              day >= 1 &&
-              day <= 4
-            ) {
+            if (has("Nes") && has("Marvs") && day <= 4) {
+              invalid = true;
+              break;
+            }
+            if (has("Raph") && has("Marvs") && day <= 4) {
               invalid = true;
               break;
             }
 
-            if ((has("Nes") || has("Raph")) && has("Erwin") && day === 1) {
-              invalid = true;
-              break;
-            }
-
+            // MORNING CONSTRAINTS
             if (has("Lady") && has("Reubs")) {
               invalid = true;
               break;
             }
 
-            if ((has("Lady") || has("Reubs")) && has("Marvs") && day === 5) {
+            if (has("Lady") && has("Erwin")) {
               invalid = true;
               break;
             }
 
+            if (has("Reubs") && has("Erwin")) {
+              invalid = true;
+              break;
+            }
+
+            // MORNING + MARVS EVERY FRIDAY CONTRAINS
             if (
-              (has("Lady") || has("Reubs")) &&
-              has("Erwin") &&
-              day >= 2 &&
-              day <= 5
+              (has("Lady") || has("Reubs") || has("Erwin")) &&
+              has("Marvs") &&
+              day === 5
             ) {
               invalid = true;
               break;
             }
 
+            // MID CONSTRAINTS
             if (has("Mariel") && has("Reubs")) {
               invalid = true;
               break;

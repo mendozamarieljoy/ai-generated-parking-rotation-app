@@ -47,6 +47,12 @@ export function isHoliday(date: Date): boolean {
   // Philippine holidays in April 2026 - only Araw ng Kagitingan
   const holidays = [
     { month: 4, day: 9 }, // Araw ng Kagitingan (Regular Holiday)
+    { month: 5, day: 1 }, // Labor day (Regular Holiday)
+    { month: 6, day: 12 }, // Independence Day (Regular Holiday)
+    { month: 8, day: 31 }, // National Heroes Day  (Regular Holiday)
+    { month: 11, day: 30 }, // Bonifacio Day  (Regular Holiday)
+    { month: 12, day: 25 }, // Christmas Day  (Regular Holiday)
+    { month: 12, day: 30 }, // Rizal Day  (Regular Holiday)
   ];
   return holidays.some((h) => h.month === month && h.day === day);
 }
