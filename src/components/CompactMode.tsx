@@ -137,7 +137,7 @@ export default function CompactMode() {
                     </div>
                     <ParkingSlotWrapper
                       date={date}
-                      innerClassName="max-w-1/3"
+                      innerClassName="max-w-1/2"
                     />
                   </>
                 )}

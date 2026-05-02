@@ -6,22 +6,9 @@ import { DaySchedule, Slot } from "@/lib/types";
 import dayjs from "dayjs";
 import Modal from "@/components/Modal";
 import ParkingSlot from "@/components/ParkingSlot";
-import Header from "@/components/Header";
 
 export default function TodaySchedulePage() {
   const { schedule, skipPrimary } = useParkingStore();
-  // const [selectedDate, setSelectedDate] = useState(() => {
-  //   const currentDate = dayjs().format("YYYY-MM-DD");
-  //   if (schedule.length > 0) {
-  //     if (schedule[0].date === currentDate) {
-  //       return schedule[0].date;
-  //     } else {
-  //       const found = schedule.find((s) => s.date === currentDate);
-  //       return found ? found.date : schedule[0].date;
-  //     }
-  //   }
-  //   return currentDate;
-  // });
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const currentDate = dayjs().format("YYYY-MM-DD");
@@ -69,13 +56,6 @@ export default function TodaySchedulePage() {
 
   return (
     <>
-      <Header
-        title="Parking Rotation System"
-        actionMenu={{
-          label: "View calendar",
-          href: "/parking",
-        }}
-      />
       <div className="flex flex-col max-w-2xl mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4">Schedule Today</h1>
 

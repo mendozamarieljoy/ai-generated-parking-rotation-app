@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/Header";
 
 const sans = Inter({
   subsets: ["latin"],
@@ -28,7 +29,10 @@ export default function RootLayout({
       className={`${mono.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <div className="min-h-screen bg-zinc-100">{children}</div>
+        <div className="min-h-screen bg-zinc-100">
+          <Header />
+          {children}
+        </div>
       </body>
     </html>
   );

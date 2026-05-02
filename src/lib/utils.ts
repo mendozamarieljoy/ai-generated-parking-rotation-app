@@ -1,6 +1,6 @@
-import { usersList } from "./constants";
-import { User, Slot, DaySchedule, SlotAssignment, UserStats } from "./types";
-import dayjs from "dayjs";
+import { holidays, usersList } from "./constants";
+import { User } from "./types";
+
 export function getDaysInMonth(year: number, month: number): Date[] {
   const days: Date[] = [];
   const date = new Date(year, month, 1);
@@ -39,12 +39,14 @@ export function calculateBenefitScore(primary: number, backup: number): number {
 export function isHoliday(date: Date): boolean {
   const month = date.getMonth() + 1; // 1-based
   const day = date.getDate();
-  // Philippine holidays in April 2026 - only Araw ng Kagitingan
-  const holidays = [
-    { month: 4, day: 9 }, // Araw ng Kagitingan (Regular Holiday)
-		{ month: 5, day: 1 }, // Labor day
-  ];
   return holidays.some((h) => h.month === month && h.day === day);
+}
+
+export function getHolidayName(date: Date): string | null {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const holiday = holidays.find((h) => h.month === month && h.day === day);
+  return holiday ? holiday.holidayName : null;
 }
 
 export function isWeekend(date: Date): boolean {
