@@ -18,7 +18,7 @@ export default function Header() {
   console.log({ pathname });
 
   return (
-    <div className="sticky top-0 w-full p-4 flex flex-col md:flex-row justify-between items-center gap-x-4 bg-slate-800 text-white shadow">
+    <div className="sticky top-0 w-full p-4 flex flex-col md:flex-row justify-between items-center gap-x-4 bg-slate-800 text-white shadow z-50">
       <p className="text-lg uppercase text-white font-bold font-mono">
         Parking Rotation System
       </p>
