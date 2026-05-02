@@ -44,7 +44,7 @@ export default function ParkingFeeTimeCalculator() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <span>💰</span>
-        <p className=" font-semibold text-zinc-800">Parking Fee Calculator</p>
+        <p className=" font-semibold text-zinc-800">Parking Fee by time</p>
       </div>
 
       {/* Inputs */}
@@ -73,26 +73,24 @@ export default function ParkingFeeTimeCalculator() {
       {/* Results */}
       {result && (
         <div className="space-y-2 border-zinc-100 py-2  text-zinc-600">
-          <p>
-            ⏱ Duration:{" "}
-            <span className="font-bold text-zinc-800">
-              {result.hours.toFixed(2)} hrs
-            </span>
-          </p>
-
-          <p>
-            Base (first 3 hrs): <span className="font-bold">₱50</span>
-          </p>
-
-          <p>
-            Extra hours:{" "}
-            <span className="font-bold">
-              {Math.max(0, result.extraHours).toFixed(2)} hrs × ₱20
-            </span>
-          </p>
-
-          <div className="pt-2  font-semibold text-zinc-800">
-            Total Fee: ₱{result.total}
+          <div className="flex justify-between items-center">
+            <p>⏱ Duration</p>
+            <p>{result.hours.toFixed(2)} hrs</p>
+          </div>
+          <div className="flex justify-between items-center">
+            <p>Base (first 3 hours)</p>
+            <p>₱50</p>
+          </div>
+          <div className="flex justify-between items-center">
+            <p>
+              Extra hours(
+              {Math.max(0, Math.ceil(result.extraHours)).toFixed(2)} hr × ₱20)
+            </p>
+            <p>₱{Math.max(0, Math.ceil(result.extraHours)) * 20}</p>
+          </div>
+          <div className="flex justify-between items-center font-bold border-t border-zinc-800 pt-2 mt-2">
+            <p>Total Fee</p>
+            <p>₱{result.total}</p>
           </div>
         </div>
       )}

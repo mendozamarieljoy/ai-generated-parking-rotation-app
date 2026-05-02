@@ -19,7 +19,7 @@ export default function Header() {
 
   return (
     <div className="sticky top-0 w-full p-4 flex flex-col md:flex-row justify-between items-center gap-x-4 bg-slate-800 text-white shadow">
-      <p className="uppercase text-white font-bold font-mono">
+      <p className="text-lg uppercase text-white font-bold font-mono">
         Parking Rotation System
       </p>
       <div className="flex items-center gap-x-4 mt-4 md:mt-0">
@@ -27,7 +27,7 @@ export default function Header() {
           <Link
             href={menu.href}
             key={menu.href}
-            className={`text-xs md:text-sm uppercase text-center ${isActive(menu.href) ? "border-b font-black text-slate-100" : "font-medium hover:border-b"}`}
+            className={`text-xs md:text-sm uppercase text-center font-mono ${isActive(menu.href) ? "border-b font-black text-slate-100" : "hover:border-b"}`}
           >
             {menu.label}
           </Link>

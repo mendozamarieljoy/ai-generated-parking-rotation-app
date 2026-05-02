@@ -23,7 +23,7 @@ export default function SwapTimeCalculator() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <span>⏱️</span>
-        <p className="font-bold text-zinc-800">Swap Time Calculator</p>
+        <p className="font-bold text-zinc-800">Swap Time</p>
       </div>
 
       {/* Input */}

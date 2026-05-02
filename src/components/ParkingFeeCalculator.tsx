@@ -18,9 +18,7 @@ export default function ParkingFeeCalculator() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <span>💰</span>
-        <p className=" font-semibold text-zinc-800">
-          Pay Parking Fee Calculator
-        </p>
+        <p className=" font-semibold text-zinc-800">Pay Parking Fee by hour</p>
       </div>
 
       {/* Inputs */}
@@ -39,23 +37,19 @@ export default function ParkingFeeCalculator() {
         </div>
       </div>
 
-      {/* Breakdown */}
       <div className="space-y-1 text-zinc-600 mt-4">
-        <p>
-          Base (first 3 hours): <span className="font-bold">₱50</span>
-        </p>
-
-        <p>
-          Extra hours:{" "}
-          <span className="font-bold">{Math.max(0, hours - 3)} hr × ₱20</span>
-        </p>
-      </div>
-
-      {/* Result */}
-      <div className="border-t border-zinc-100 mt-2">
-        <p className=" font-semibold text-zinc-800 mt-2">
-          Total Fee: ₱{result}
-        </p>
+        <div className="flex justify-between items-center">
+          <p>Base (first 3 hours)</p>
+          <p>₱50</p>
+        </div>
+        <div className="flex justify-between items-center">
+          <p>Extra hours({Math.max(0, hours - 3)} hr × ₱20)</p>
+          <p>₱{Math.max(0, hours - 3) * 20}</p>
+        </div>
+        <div className="flex justify-between items-center font-bold border-t border-zinc-800 pt-2 mt-2">
+          <p>Total Fee</p>
+          <p>₱{result}</p>
+        </div>
       </div>
     </div>
   );

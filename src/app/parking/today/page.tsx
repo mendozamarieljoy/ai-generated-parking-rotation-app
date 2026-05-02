@@ -57,7 +57,9 @@ export default function TodaySchedulePage() {
   return (
     <>
       <div className="flex flex-col max-w-2xl mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4">Schedule Today</h1>
+        <h1 className="text-2xl font-black font-mono uppercase mb-4">
+          Schedule Today
+        </h1>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <label
@@ -68,13 +70,12 @@ export default function TodaySchedulePage() {
           </label>
           <select
             id="date"
-            // className="w-full border border-gray-300 rounded px-3 py-2"
-            className="w-full outline-none py-2 border-b bg-transparent cursor-pointer"
+            className="w-full outline-none py-2 border-b bg-transparent cursor-pointer text-2xl font-black text-zinc-800 uppercase font-mono"
             value={selectedDate}
             onChange={(event) => setSelectedDate(event.target.value)}
           >
             {availableDates.map((date) => (
-              <option key={date} value={date}>
+              <option key={date} value={date} className="text-sm">
                 {dayjs(date).format("MMMM D, YYYY (dddd)")}
               </option>
             ))}
@@ -83,9 +84,6 @@ export default function TodaySchedulePage() {
 
         {scheduleForDate ? (
           <div className="bg-white p-6 rounded-lg shadow-md space-y-4 h-full">
-            <h2 className="text-2xl font-semibold">
-              Schedule for {dayjs(selectedDate).format("MMMM D, YYYY (dddd)")}
-            </h2>
             <div className="flex gap-4 h-32 md:h-42">
               {Object.entries(scheduleForDate.slots).map(
                 ([slot, assignment]) => (

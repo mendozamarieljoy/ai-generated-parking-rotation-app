@@ -12,18 +12,16 @@ import {
   getDayName,
   isWeekend,
   isHoliday,
-  validateMatch,
 } from "./utils";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
-const slots: Slot[] = ["27", "28"];
+const slots = ["332", "27", "28"] as const;
 
 type UnavailableSlotsByDate = Record<string, Slot[]>;
 
-// ADD DATES WITH UNAVAILABLE SLOTS: "YYYY-MM-DD": ["SLOT NUMBER"],
 const unavailableSlotsByDate: UnavailableSlotsByDate = {};
 
 function getCombinations<T>(arr: T[], k: number): T[][] {
@@ -93,10 +91,11 @@ function getPartialPermutations<T>(arr: T[], size: number): T[][] {
 }
 
 function evaluateFairnessScore(
-  stats: Record<User, { primary: number; backup: number }>,
+  stats: Record<User, { primary: number; backup: number; slot332: number }>,
 ): number {
   const userValues = users.map(
-    (user) => stats[user].primary * 2 + stats[user].backup,
+    (user) =>
+      stats[user].primary * 2 + stats[user].backup - stats[user].slot332 * 1.5,
   );
 
   const maxValue = Math.max(...userValues);
@@ -104,12 +103,19 @@ function evaluateFairnessScore(
 
   const primaryCounts = users.map((user) => stats[user].primary);
   const backupCounts = users.map((user) => stats[user].backup);
+  const slot332Counts = users.map((user) => stats[user].slot332);
 
   const rangePrimary = Math.max(...primaryCounts) - Math.min(...primaryCounts);
   const rangeBackup = Math.max(...backupCounts) - Math.min(...backupCounts);
+  const range332 = Math.max(...slot332Counts) - Math.min(...slot332Counts);
 
   // Weight by how close the composite score is across users first, then by distribution stability.
-  return (maxValue - minValue) * 1000 + rangePrimary * 100 + rangeBackup * 10;
+  return (
+    (maxValue - minValue) * 1000 +
+    rangePrimary * 100 +
+    rangeBackup * 10 +
+    range332
+  );
 }
 
 export function generateSchedule(year: number, month: number): DaySchedule[] {
@@ -119,9 +125,12 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
   const schedule: DaySchedule[] = [];
 
   // Track usage for fairness
-  const userStats = {} as Record<User, { primary: number; backup: number }>;
+  const userStats = {} as Record<
+    User,
+    { primary: number; backup: number; slot332: number }
+  >;
   users.forEach((user) => {
-    userStats[user] = { primary: 0, backup: 0 };
+    userStats[user] = { primary: 0, backup: 0, slot332: 0 };
   });
 
   for (const date of days) {
@@ -161,13 +170,18 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
           let invalid = false;
           const day = date.getDay();
 
-          const daySlots: Record<Slot, SlotAssignment> = {
+          const daySlots: Record<Slot, SlotAssignment> | null = {
+            332: { primary: primarySet[0], backup: backupSet[0] },
             27: { primary: primarySet[1], backup: backupSet[1] },
             28: { primary: primarySet[2], backup: backupSet[2] },
           };
 
           // THEN validate per slot safely
           for (const slot of slots) {
+            if (slot === "332") {
+              daySlots[slot] = null;
+              continue;
+            }
             const primary = daySlots[slot] ? daySlots[slot].primary : "";
             const backup = daySlots[slot] ? daySlots[slot].backup : "";
 
@@ -179,51 +193,48 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
               break;
             }
 
-            // if (has("Marvs") && has("Erwin") && day === 5) {
-            //   invalid = true;
-            //   break;
-            // }
-
+            // AFTERNOON CONSTRAINTS
             if (has("Nes") && has("Raph")) {
               invalid = true;
               break;
             }
 
-            if (
-              (has("Nes") || has("Raph")) &&
-              has("Marvs") &&
-              day >= 1 &&
-              day <= 4
-            ) {
+            if (has("Nes") && has("Marvs") && day <= 4) {
+              invalid = true;
+              break;
+            }
+            if (has("Raph") && has("Marvs") && day <= 4) {
               invalid = true;
               break;
             }
 
-            if ((has("Nes") || has("Raph")) && has("Erwin") && day === 1) {
-              invalid = true;
-              break;
-            }
-
+            // MORNING CONSTRAINTS
             if (has("Lady") && has("Reubs")) {
               invalid = true;
               break;
             }
 
-            if ((has("Lady") || has("Reubs")) && has("Marvs") && day === 5) {
+            if (has("Lady") && has("Erwin")) {
               invalid = true;
               break;
             }
 
+            if (has("Reubs") && has("Erwin")) {
+              invalid = true;
+              break;
+            }
+
+            // MORNING + MARVS EVERY FRIDAY CONTRAINS
             if (
-              (has("Lady") || has("Reubs")) &&
-              has("Erwin") &&
-              day >= 2 &&
-              day <= 5
+              (has("Lady") || has("Reubs") || has("Erwin")) &&
+              has("Marvs") &&
+              day === 5
             ) {
               invalid = true;
               break;
             }
 
+            // MID CONSTRAINTS
             if (has("Mariel") && has("Reubs")) {
               invalid = true;
               break;
@@ -239,7 +250,10 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
               acc[user] = { ...userStats[user] };
               return acc;
             },
-            {} as Record<User, { primary: number; backup: number }>,
+            {} as Record<
+              User,
+              { primary: number; backup: number; slot332: number }
+            >,
           );
 
           slots.forEach((slot, i) => {
@@ -249,6 +263,9 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
             projectedStats[primary].primary += 1;
             projectedStats[backup].backup += 1;
 
+            if (slot === "332") {
+              projectedStats[primary].slot332 += 1;
+            }
             if (unavailableSlots.includes(slot)) {
               daySlots[slot] = null;
               return;
@@ -274,6 +291,9 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
       if (slotValue) {
         userStats[slotValue.primary!].primary += 1;
         userStats[slotValue.backup!].backup += 1;
+        if (slot === "332") {
+          userStats[slotValue.primary!].slot332 += 1;
+        }
       }
     });
 
