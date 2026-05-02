@@ -110,7 +110,12 @@ function evaluateFairnessScore(
   const range332 = Math.max(...slot332Counts) - Math.min(...slot332Counts);
 
   // Weight by how close the composite score is across users first, then by distribution stability.
-  return (maxValue - minValue) * 1000 + rangePrimary * 100 + rangeBackup * 10;
+  return (
+    (maxValue - minValue) * 1000 +
+    rangePrimary * 100 +
+    rangeBackup * 10 +
+    range332
+  );
 }
 
 export function generateSchedule(year: number, month: number): DaySchedule[] {
@@ -170,7 +175,7 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
           let invalid = false;
           const day = date.getDay();
 
-          const daySlots: Record<Slot, SlotAssignment> = {
+          const daySlots: Record<Slot, SlotAssignment> | null = {
             332: { primary: primarySet[0], backup: backupSet[0] },
             27: { primary: primarySet[1], backup: backupSet[1] },
             28: { primary: primarySet[2], backup: backupSet[2] },
