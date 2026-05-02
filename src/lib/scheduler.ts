@@ -12,38 +12,17 @@ import {
   getDayName,
   isWeekend,
   isHoliday,
-  validateMatch,
 } from "./utils";
 
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
-const slots: Slot[] = ["332", "27", "28"];
+const slots = ["332", "27", "28"] as const;
 
 type UnavailableSlotsByDate = Record<string, Slot[]>;
 
-const unavailableSlotsByDate: UnavailableSlotsByDate = {
-  "2026-04-06": ["332"],
-  "2026-04-07": ["332"],
-  "2026-04-08": ["332"],
-  "2026-04-09": ["332"],
-  "2026-04-10": ["332"],
-  "2026-04-13": ["332"],
-  "2026-04-14": ["332"],
-  "2026-04-15": ["332"],
-  "2026-04-16": ["332"],
-  "2026-04-17": ["332"],
-  "2026-04-20": ["332"],
-  "2026-04-21": ["332"],
-  "2026-04-22": ["332"],
-  "2026-04-23": ["332"],
-  "2026-04-24": ["332"],
-  "2026-04-27": ["332"],
-  "2026-04-28": ["332"],
-  "2026-04-29": ["332"],
-  "2026-04-30": ["332"],
-};
+const unavailableSlotsByDate: UnavailableSlotsByDate = {};
 
 function getCombinations<T>(arr: T[], k: number): T[][] {
   const result: T[][] = [];
@@ -131,12 +110,7 @@ function evaluateFairnessScore(
   const range332 = Math.max(...slot332Counts) - Math.min(...slot332Counts);
 
   // Weight by how close the composite score is across users first, then by distribution stability.
-  return (
-    (maxValue - minValue) * 1000 +
-    rangePrimary * 100 +
-    rangeBackup * 10 +
-    range332
-  );
+  return (maxValue - minValue) * 1000 + rangePrimary * 100 + rangeBackup * 10;
 }
 
 export function generateSchedule(year: number, month: number): DaySchedule[] {
