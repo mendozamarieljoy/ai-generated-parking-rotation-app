@@ -291,7 +291,6 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
     const { schedule } = get();
     const filteredSchedule = [...schedule].map((daySchedule) => {
       const updatedSlots: DaySlots = {
-        332: null,
         27: null,
         28: null,
       };
