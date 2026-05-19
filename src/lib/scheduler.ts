@@ -239,6 +239,33 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
               invalid = true;
               break;
             }
+
+            // MANUAL SCHEDULING
+            // TODO: To be removed by June 2026
+            if (dayjs(date).isAfter(dayjs("2026-05-19")) && has("Erwin")) {
+              invalid = true;
+              break;
+            }
+
+            if (
+              dayjs(date).isAfter(dayjs("2026-05-19")) &&
+              has("Mariel") &&
+              has("Lady")
+            ) {
+              invalid = true;
+              break;
+            }
+
+            if (dayjs(date).isSame(dayjs("2026-05-20")) && has("Reubs")) {
+              invalid = true;
+              break;
+            }
+
+            // KCS FE OUTING
+            if (dayjs(date).isSame(dayjs("2026-05-21")) && has("Nes")) {
+              invalid = true;
+              break;
+            }
           }
 
           if (invalid) {
@@ -296,6 +323,11 @@ export function generateSchedule(year: number, month: number): DaySchedule[] {
         }
       }
     });
+
+    if (phtDate === "2026-05-22") {
+      assignments["27"] = { primary: "Mariel", backup: null };
+      assignments["28"] = { primary: "Marvs", backup: null };
+    }
 
     schedule.push({
       date: phtDate,
