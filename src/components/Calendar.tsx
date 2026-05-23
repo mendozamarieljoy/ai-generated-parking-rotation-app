@@ -112,21 +112,35 @@ export default function Calendar() {
               {day}
             </div>
           ))}
-          {weekdayCalendarDays.map((date, index) => (
-            <div
-              key={index}
-              className={`min-h-32 ${date && "bg-white-100 p-4 border border-slate-200 shadow rounded-lg"}`}
-            >
-              {date && (
-                <>
-                  <div className="text-sm font-sans font-semibold mb-1 text-black">
-                    {date.getDate()}
-                  </div>
-                  <ParkingSlotWrapper date={date} innerClassName="max-w-1/2" />
-                </>
-              )}
-            </div>
-          ))}
+          {weekdayCalendarDays.map((date, index) => {
+            const datePassed = dayjs(date).isBefore(dayjs(), "day");
+            const isToday = dayjs(date).isSame(dayjs(), "day");
+
+            const bgColor = datePassed
+              ? "bg-slate-100 opacity-50 cursor-not-allowed"
+              : isToday
+                ? "bg-yellow-50 border-yellow-300"
+                : "bg-white";
+
+            return (
+              <div
+                key={index}
+                className={`min-h-32 ${date && `${bgColor} p-4 border border-slate-200 shadow rounded-lg`}`}
+              >
+                {date && (
+                  <>
+                    <div className="text-sm font-sans font-semibold mb-1 text-black">
+                      {date.getDate()}
+                    </div>
+                    <ParkingSlotWrapper
+                      date={date}
+                      innerClassName="max-w-1/2"
+                    />
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
       <CompactMode />
