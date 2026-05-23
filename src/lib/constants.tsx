@@ -23,7 +23,7 @@ export const holidays = [
   { month: 1, day: 1, holidayName: "New Year's Day" },
   { month: 4, day: 9, holidayName: "Araw ng Kagitingan" },
   { month: 5, day: 1, holidayName: "Labor Day" },
-  { month: 5, day: 27, holidayName: "Eid'l Fitr" },
+  { month: 5, day: 27, holidayName: "Eid'l Adha (Feast of Sacrifice)" },
   { month: 6, day: 12, holidayName: "Independence Day" },
   { month: 8, day: 31, holidayName: "National Heroes Day" },
   { month: 11, day: 30, holidayName: "Bonifacio Day" },
