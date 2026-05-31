@@ -93,8 +93,8 @@ function calculateCostStats(
   return costStats;
 }
 
-const DEFAULT_YEAR = 2026;
-const DEFAULT_MONTH = 4;
+const DEFAULT_YEAR = new Date().getFullYear();
+const DEFAULT_MONTH = new Date().getMonth();
 
 // Initialize stats
 const initialSchedule = generateSchedule(DEFAULT_YEAR, DEFAULT_MONTH);
