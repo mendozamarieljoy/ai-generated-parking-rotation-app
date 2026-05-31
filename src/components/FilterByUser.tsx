@@ -3,6 +3,7 @@ import { useParkingStore } from "@/lib/store";
 
 export default function FilterByUser() {
   const { filterByUsers, filteredUsers } = useParkingStore();
+  const removedUsers = ["Erwin"] // TODO: Remove entirely from codebase
 
   const onHandleClick = (isCurrentlySelected: boolean, user: string) => {
     const tempFilteredUsers = filteredUsers;
@@ -20,7 +21,7 @@ export default function FilterByUser() {
     <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-4">
       <p className="text-xs text-left md:text-center">Filter by user:</p>
       <div className="flex flex-wrap gap-2 md:gap-4">
-        {usersList.map((user) => {
+        {usersList.filter((name) => !removedUsers.includes(name)).map((user) => {
           const isUserFiltered = filteredUsers.includes(user);
           return (
             <button
