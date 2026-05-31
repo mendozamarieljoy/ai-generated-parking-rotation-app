@@ -85,7 +85,7 @@ export default function CompactMode() {
   };
 
   const showedSchedules = useMemo(() => {
-    return weekdayCalendarDays.filter((date) => {
+    const filteredSched = weekdayCalendarDays.filter((date) => {
       const formattedDate = dayjs(date).format("YYYY-MM-DD");
       const hasSchedule = displaySchedule.find((sched) => {
         if (!showUpcomingDates) return compareDate(date, sched);
@@ -97,7 +97,12 @@ export default function CompactMode() {
 
       return hasSchedule;
     });
-  }, [weekdayCalendarDays, displaySchedule, showUpcomingDates]);
+
+    if (!filteredSched.length) setDate(selectedYear, selectedMonth + 1);
+
+    return filteredSched;
+
+  }, [weekdayCalendarDays, displaySchedule, showUpcomingDates, selectedYear, selectedMonth, setDate]);
 
   return (
     <>
