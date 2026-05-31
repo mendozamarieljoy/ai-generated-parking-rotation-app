@@ -98,11 +98,11 @@ export default function CompactMode() {
       return hasSchedule;
     });
 
-    if (!filteredSched.lenght) setDate(selectedYear, selectedMonth + 1):
+    if (!filteredSched.lenght) setDate(selectedYear, selectedMonth + 1);
 
     return filteredSched;
 
-  }, [weekdayCalendarDays, displaySchedule, showUpcomingDates]);
+  }, [weekdayCalendarDays, displaySchedule, showUpcomingDates, selectedYear, selectedMonth, setDate]);
 
   return (
     <>
